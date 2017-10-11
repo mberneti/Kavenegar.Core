@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0.0-alpha</Version>
+    
+    <TargetFramework>netstandard1.1</TargetFramework>
+    <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
+    <RootNamespace>Kavenegar.Core</RootNamespace>
+    <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
+    <AssemblyName>Kavenegar.Core</AssemblyName>
+    
+    <PackageId>Kavenegar.Core</PackageId>
+    <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore</PackageTags>
+    <PackageIconUrl>https://secure.gravatar.com/avatar/0742fdb693a34ceb3f107cdfc0b3b24e?s=128</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/mberneti/Kavenegar.Core</PackageProjectUrl>
+
+    <OutputType>Library</OutputType>    
+    <RestorePackages>true</RestorePackages>
+    <BuildPackage>true</BuildPackage>
+    <Authors>Mohammadreza Berneti (mberneti@live.com)</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/mberneti/kavenegar.Core</RepositoryUrl>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+</Project>
