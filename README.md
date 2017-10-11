@@ -1,4 +1,4 @@
-# Kavenegar Dot Net Standard SDK
+# Kavenegar Dot Net Standard Client
 A cross-platform library for the Kavenegar sms web service; written in C#.
 This package uses [kavenegar-csharp](https://github.com/KaveNegar/kavenegar-csharp) project under the hood.
 
