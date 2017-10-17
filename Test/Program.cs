@@ -14,11 +14,11 @@ namespace test
             Console.OutputEncoding = Encoding.UTF8;
             try
             {
-                var receptors = new List<string> { "09356099419" };
+                var receptors = new List<string> { "<ReceptorNumber>" };
 
-                var api = new KavenegarApi("4E496A78385546715A62627834437A723941426263513D3D");
-
-                var result = await api.Send("0013658000175", receptors, "خدمات پیام کوتاه کاوه نگار");
+                var api = new KavenegarApi("<ApiKey>");
+                
+	            var result = await api.Send("<SenderNumber>", receptors, "<Message>");
 
                 foreach (var r in result)
                 {

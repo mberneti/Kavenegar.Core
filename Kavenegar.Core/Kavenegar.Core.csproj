@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.1-alpha</Version>
+    <Version>1.0.1-alpha2</Version>
     
     <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;</TargetFrameworks>
     <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>

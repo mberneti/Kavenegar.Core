@@ -125,7 +125,7 @@ namespace Kavenegar
 
         private async Task<string> Execute(string path, Dictionary<string, object> _params)
         {
-            var nvc = _params?.Select(x=> new KeyValuePair<string, string>(x.Key,x.Value.ToString()));
+            var nvc = _params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
 
             var postdata = new FormUrlEncodedContent(nvc);
 
@@ -569,16 +569,16 @@ namespace Kavenegar
         {
             var path = GetApiPath("verify", "lookup", "json");
             var param = new Dictionary<string, object>
-        {
-            {"receptor", receptor},
-            {"template", template},
-            {"token", token},
-            {"token2", token2},
-            {"token3", token3},
-            {"token10", token10},
-            {"token20", token20},
-            {"type", type},
-        };
+            {
+                {"receptor", receptor},
+                {"template", template},
+                {"token", token},
+                {"token2", token2},
+                {"token3", token3},
+                {"token10", token10},
+                {"token20", token20},
+                {"type", type},
+            };
             var responsebody = await Execute(path, param);
             var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
             return l.entries[0];

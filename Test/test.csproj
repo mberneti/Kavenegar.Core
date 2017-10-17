@@ -5,6 +5,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Kavenegar.Core" Version="1.0.0-alpha" />
+    <PackageReference Include="Kavenegar.Core" Version="1.0.1-alpha2" />
   </ItemGroup>
 </Project>
