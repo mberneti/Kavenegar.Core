@@ -3,15 +3,15 @@ A cross-platform library for the Kavenegar sms web service; written in C#.
 This package uses [kavenegar-csharp](https://github.com/KaveNegar/kavenegar-csharp) project under the hood.
 
 ## Installation
-The package can be installed via [nuget](https://www.nuget.org/packages/Kavenegar.Core/1.0.1-alpha2):
+The package can be installed via [nuget](https://www.nuget.org/packages/Kavenegar.Core/1.0.1-alpha3):
 
 ##### Package Manager
 ```
-Install-Package Kavenegar.Core -Version 1.0.1-alpha2
+Install-Package Kavenegar.Core -Version 1.0.1-alpha3
 ```
 ##### .NET CLI
 ```
-dotnet add package Kavenegar.Core --version 1.0.1-alpha2
+dotnet add package Kavenegar.Core --version 1.0.1-alpha3
 ```
 
 ## Usage
