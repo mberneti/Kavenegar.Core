@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Version>1.0.1-alpha2</Version>
     
-    <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
     <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
     <RootNamespace>Kavenegar.Core</RootNamespace>
     <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
