@@ -7,11 +7,11 @@ The package can be installed via [nuget](https://www.nuget.org/packages/Kavenega
 
 ##### Package Manager
 ```
-Install-Package Kavenegar.Core -Version 1.0.1-alpha2
+Install-Package Kavenegar.Core -Version 1.0.1
 ```
 ##### .NET CLI
 ```
-dotnet add package Kavenegar.Core --version 1.0.1-alpha2
+dotnet add package Kavenegar.Core --version 1.0.1
 ```
 
 ## Usage
