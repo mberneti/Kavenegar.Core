@@ -105,8 +105,10 @@ namespace Kavenegar
             _apikey = apikey;
 
             var baseUri = new Uri($"{BaseUrl}/{_apikey}/");
+
             if (client.BaseAddress != baseUri)
                 client.BaseAddress = baseUri;
+
             _client = client;
 
         }
