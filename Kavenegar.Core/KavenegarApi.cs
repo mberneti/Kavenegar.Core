@@ -192,7 +192,7 @@ namespace Kavenegar
         {
             {"sender", System.Net.WebUtility.HtmlEncode(sender)},
             {"receptor", System.Net.WebUtility.HtmlEncode(StringHelper.Join(",", receptor.ToArray()))},
-            {"message", System.Net.WebUtility.HtmlEncode(message)},
+            {"message", message},
             {"type", (int) type},
             {"date", date == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(date)}
         };
