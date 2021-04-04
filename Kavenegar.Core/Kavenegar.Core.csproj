@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.1-alpha2</Version>
+    <Version>1.0.3</Version>
     
     <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;</TargetFrameworks>
     <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
@@ -9,17 +9,20 @@
     <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
     <AssemblyName>Kavenegar.Core</AssemblyName>
     
-    <PackageId>Kavenegar.Core</PackageId>
-    <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore</PackageTags>
-    <PackageIconUrl>https://secure.gravatar.com/avatar/0742fdb693a34ceb3f107cdfc0b3b24e?s=128</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/mberneti/Kavenegar.Core</PackageProjectUrl>
+    <PackageId>KavenegarDotNetCore</PackageId>
+    <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore Sms</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageProjectUrl>https://github.com/kavenegar/Kavenegar.Core</PackageProjectUrl>
 
     <OutputType>Library</OutputType>    
     <RestorePackages>true</RestorePackages>
     <BuildPackage>true</BuildPackage>
-    <Authors>Mohammadreza Berneti (mberneti@live.com)</Authors>
+    <Authors>HadiEskandari Ardavan HosseinRezaei Mberneti MohammadAmirriazi</Authors>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/mberneti/kavenegar.Core</RepositoryUrl>
+    <RepositoryUrl>https://github.com/kavenegar/Kavenegar.Core</RepositoryUrl>
+    <Company>Kavenegar</Company>
+    <PackageIcon></PackageIcon>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
   </PropertyGroup>
 
