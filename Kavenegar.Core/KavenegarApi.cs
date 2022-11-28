@@ -100,6 +100,19 @@ namespace Kavenegar
 
         }
 
+        public KavenegarApi(string apikey, HttpClient client)
+        {
+            _apikey = apikey;
+
+            var baseUri = new Uri($"{BaseUrl}/{_apikey}/");
+
+            if (client.BaseAddress != baseUri)
+                client.BaseAddress = baseUri;
+
+            _client = client;
+
+        }
+
         public string ApiKey
         {
             set => _apikey = value;
