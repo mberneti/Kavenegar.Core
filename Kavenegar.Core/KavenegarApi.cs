@@ -140,7 +140,7 @@ namespace Kavenegar
         {
             var nvc = _params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
 
-            var postdata = new FormUrlEncodedContent(nvc);
+            var postdata = nvc == null ? null : new FormUrlEncodedContent(nvc);
 
             var response = await _client.PostAsync(path, postdata);
             var responseBody = await response.Content.ReadAsStringAsync();
