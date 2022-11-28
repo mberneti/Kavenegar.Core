@@ -7,11 +7,11 @@ The package can be installed via [nuget](https://www.nuget.org/packages/Kavenega
 
 ##### Package Manager
 ```
-Install-Package KavenegarDotNetCore -Version 1.0.4
+Install-Package KavenegarDotNetCore -Version 1.0.5
 ```
 ##### .NET CLI
 ```
-dotnet add package KavenegarDotNetCore --version 1.0.4
+dotnet add package KavenegarDotNetCore --version 1.0.5
 ```
 
 ## Usage
