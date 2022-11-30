@@ -1,8 +1,7 @@
-namespace Kavenegar.Core.Models
+namespace Kavenegar.Core.Models;
+
+public class CountOutboxResult : CountInboxResult
 {
- public class CountOutboxResult : CountInboxResult
- {
-	public long SumPart { get; set; }
-	public long Cost { get; set; }
- }
+    public long SumPart { get; set; }
+    public long Cost { get; set; }
 }

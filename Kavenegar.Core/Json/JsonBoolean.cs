@@ -1,21 +1,18 @@
-﻿using System;
+﻿namespace Kavenegar.Core.Json;
 
-namespace Kavenegar.Core.Json
+public class JsonBoolean : JsonObject
 {
+    public JsonBoolean(
+        bool booleanValue)
+    {
+        BooleanValue = booleanValue;
+    }
 
- public class JsonBoolean : JsonObject
- {
-	public Boolean BooleanValue { get; set; }
+    public bool BooleanValue { get; set; }
 
-	public JsonBoolean(Boolean booleanValue)
-	{
-	 BooleanValue = booleanValue;
-	}
-
-	public JsonObject UpCast()
-	{
-	 JsonObject objectJ = this;
-	 return objectJ;
-	}
- }
+    public JsonObject UpCast()
+    {
+        JsonObject objectJ = this;
+        return objectJ;
+    }
 }

@@ -1,22 +1,18 @@
-﻿using System;
+﻿namespace Kavenegar.Core.Json;
 
-namespace Kavenegar.Core.Json
+public class JsonString : JsonObject
 {
- public class JsonString : JsonObject
- {
-	public String Text { get; set; }
+    public JsonString(
+        string text)
+    {
+        Text = text;
+    }
 
-	public JsonString(String text)
-	{
-	 Text = text;
-	}
+    public string Text { get; set; }
 
-	public JsonObject UpCast()
-	{
-	 JsonObject objectJ = this;
-	 return objectJ;
-	}
-
-
- }
+    public JsonObject UpCast()
+    {
+        JsonObject objectJ = this;
+        return objectJ;
+    }
 }

@@ -1,10 +1,9 @@
-namespace Kavenegar.Core.Models.Enums
+namespace Kavenegar.Core.Models.Enums;
+
+public enum MessageType
 {
- public enum MessageType
- {
-	Flash = 0,
-	MobileMemory = 1,
-	SimMemory = 2,
-	AppMemory = 3
- }
+    Flash = 0,
+    MobileMemory = 1,
+    SimMemory = 2,
+    AppMemory = 3
 }

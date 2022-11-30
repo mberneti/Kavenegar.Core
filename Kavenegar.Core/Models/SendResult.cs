@@ -1,29 +1,28 @@
 using System;
 using Kavenegar.Core.Utils;
 
-namespace Kavenegar.Core.Models
+namespace Kavenegar.Core.Models;
+
+public class SendResult
 {
- public class SendResult
- {
-	public long Messageid { get; set; }
+    public long Messageid { get; set; }
 
-	public int Cost { get; set; }
+    public int Cost { get; set; }
 
-	public DateTime GregorianDate
-	{
-	 get { return DateHelper.UnixTimestampToDateTime(Date); }
-	 set { Date = DateHelper.DateTimeToUnixTimestamp(value); }
-	}
-	
-	public long Date { get; set; }
+    public DateTime GregorianDate
+    {
+        get => DateHelper.UnixTimestampToDateTime(Date);
+        set => Date = DateHelper.DateTimeToUnixTimestamp(value);
+    }
 
-	public string Message { get; set; }
+    public double Date { get; set; }
 
-	public string Receptor { get; set; }
+    public string Message { get; set; }
 
-	public string Sender { get; set; }
-	public int Status { get; set; }
+    public string Receptor { get; set; }
 
-	public string StatusText { get; set; }
- }
+    public string Sender { get; set; }
+    public int Status { get; set; }
+
+    public string StatusText { get; set; }
 }

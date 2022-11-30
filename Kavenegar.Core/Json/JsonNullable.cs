@@ -1,20 +1,17 @@
-﻿using System;
+﻿namespace Kavenegar.Core.Json;
 
-namespace Kavenegar.Core.Json
+public class JsonNullable : JsonObject
 {
- public class JsonNullable : JsonObject
- {
-	public String Nullable { get; set; }
+    public JsonNullable()
+    {
+        Nullable = "Null";
+    }
 
-	public JsonNullable()
-	{
-	 Nullable = "Null";
-	}
+    public string Nullable { get; set; }
 
-	public JsonObject UpCast()
-	{
-	 JsonObject objectJ = this;
-	 return objectJ;
-	}
- }
+    public JsonObject UpCast()
+    {
+        JsonObject objectJ = this;
+        return objectJ;
+    }
 }

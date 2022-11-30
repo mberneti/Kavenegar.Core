@@ -1,21 +1,18 @@
-﻿using Kavenegar.Core.Json;
+﻿namespace Kavenegar.Core.Json;
 
-namespace Kavenegar.Core.Json
+public class JsonNumber : JsonObject
 {
- public class JsonNumber : JsonObject
- {
-	public float Number { get; set; }
+    public JsonNumber(
+        float number)
+    {
+        Number = number;
+    }
 
-	public JsonNumber(float number)
-	{
-	 Number = number;
-	}
+    public float Number { get; set; }
 
-	public JsonObject UpCast()
-	{
-	 JsonObject objectJ = this;
-	 return objectJ;
-	}
- }
-
+    public JsonObject UpCast()
+    {
+        JsonObject objectJ = this;
+        return objectJ;
+    }
 }

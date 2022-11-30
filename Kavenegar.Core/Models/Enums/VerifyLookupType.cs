@@ -1,8 +1,7 @@
-namespace Kavenegar.Core.Models.Enums
+namespace Kavenegar.Core.Models.Enums;
+
+public enum VerifyLookupType
 {
- public enum VerifyLookupType
- {
-	Sms = 0,
-	Call = 1,
- }
+    Sms = 0,
+    Call = 1
 }

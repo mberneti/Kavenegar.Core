@@ -1,57 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Kavenegar.Core.Json
+namespace Kavenegar.Core.Json;
+
+public class JsonArray : JsonObject
 {
+    private List<JsonObject>.Enumerator _e;
 
- public class JsonArray : JsonObject
- {
-	public List<JsonObject> Array { get; set; }
-	private List<JsonObject>.Enumerator _e;
+    public JsonArray()
+    {
+        Array = new List<JsonObject>();
+    }
 
-	public JsonArray()
-	{
-	 Array = new List<JsonObject>();
-	}
+    public List<JsonObject> Array { get; set; }
 
-	public void AddElementToArray(JsonObject arrayElement)
-	{
-	 Array.Add(arrayElement);
-	}
+    public int Count => Array.Count;
 
-	public JsonObject UpCast()
-	{
-	 JsonObject objectJ = this;
-	 return objectJ;
-	}
+    public void AddElementToArray(
+        JsonObject arrayElement)
+    {
+        Array.Add(arrayElement);
+    }
 
-	public void AddList(List<JsonObject> lista)
-	{
-	 Array = lista;
-	}
+    public JsonObject UpCast()
+    {
+        JsonObject objectJ = this;
+        return objectJ;
+    }
 
-	public Boolean NextObject(out JsonObject o)
-	{
+    public void AddList(
+        List<JsonObject> lista)
+    {
+        Array = lista;
+    }
 
-	 JsonObject outObject;
-	 _e = Array.GetEnumerator();
+    public bool NextObject(
+        out JsonObject o)
+    {
+        JsonObject outObject;
+        _e = Array.GetEnumerator();
 
-	 if (_e.MoveNext())
-	 {
-		outObject = _e.Current;
-		o = outObject;
-		return true;
-	 }
-	 outObject = new JsonObject();
-	 o = outObject;
-	 return false;
-	}
+        if (_e.MoveNext())
+        {
+            outObject = _e.Current;
+            o = outObject;
+            return true;
+        }
 
-	public int Count
-	{
-	 get { return Array.Count; }
-	}
-
- }
-
+        outObject = new JsonObject();
+        o = outObject;
+        return false;
+    }
 }

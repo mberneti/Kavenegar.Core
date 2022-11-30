@@ -1,33 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Version>1.0.5</Version>
-    
-    <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;</TargetFrameworks>
-    <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
-    <RootNamespace>Kavenegar.Core</RootNamespace>
-    <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
-    <AssemblyName>Kavenegar.Core</AssemblyName>
-    
-    <PackageId>KavenegarDotNetCore</PackageId>
-    <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore Sms</PackageTags>
-    <PackageIconUrl></PackageIconUrl>
-    <PackageProjectUrl>https://github.com/kavenegar/Kavenegar.Core</PackageProjectUrl>
+    <PropertyGroup>
+        <Version>1.0.5</Version>
 
-    <OutputType>Library</OutputType>    
-    <RestorePackages>true</RestorePackages>
-    <BuildPackage>true</BuildPackage>
-    <Authors>HadiEskandari Ardavan HosseinRezaei Mberneti MohammadAmirriazi</Authors>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/kavenegar/Kavenegar.Core</RepositoryUrl>
-    <Company>Kavenegar</Company>
-    <PackageIcon></PackageIcon>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <TargetFrameworks>net6.0;net6.0-windows;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0</TargetFrameworks>
+        <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
+        <RootNamespace>Kavenegar.Core</RootNamespace>
+        <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
 
-  </PropertyGroup>
+        <PackageId>KavenegarDotNetCore</PackageId>
+        <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore Sms</PackageTags>
+        <PackageIconUrl></PackageIconUrl>
+        <PackageProjectUrl>https://github.com/kavenegar/Kavenegar.Core</PackageProjectUrl>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-  </ItemGroup>
+        <OutputType>Library</OutputType>
+        <RestorePackages>true</RestorePackages>
+        <BuildPackage>true</BuildPackage>
+        <Authors>HadiEskandari Ardavan HosseinRezaei Mberneti MohammadAmirriazi</Authors>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/kavenegar/Kavenegar.Core</RepositoryUrl>
+        <Company>Kavenegar</Company>
+        <PackageIcon></PackageIcon>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>11</LangVersion>
+        <Nullable>enable</Nullable>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    </ItemGroup>
 
 </Project>

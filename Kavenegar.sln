@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Kavenegar.Core\Kavenegar.Core.csproj", "{4B4EA3FD-4296-4A75-9A59-04BC580BC846}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{0E27FAE0-128A-4B33-86AC-EC949911C220}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{5A102430-241D-46A1-A615-0149411194D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B4EA3FD-4296-4A75-9A59-04BC580BC846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4EA3FD-4296-4A75-9A59-04BC580BC846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B4EA3FD-4296-4A75-9A59-04BC580BC846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B4EA3FD-4296-4A75-9A59-04BC580BC846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5A102430-241D-46A1-A615-0149411194D5} = {0E27FAE0-128A-4B33-86AC-EC949911C220}
+	EndGlobalSection
+EndGlobal

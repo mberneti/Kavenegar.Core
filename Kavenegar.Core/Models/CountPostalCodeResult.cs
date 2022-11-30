@@ -1,8 +1,7 @@
-namespace Kavenegar.Core.Models
+namespace Kavenegar.Core.Models;
+
+public class CountPostalCodeResult
 {
- public class CountPostalCodeResult
- {
-	public string Section { get; set; }
-	public int Value { get; set; }
- }
+    public string Section { get; set; }
+    public int Value { get; set; }
 }
