@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Kavenegar.Core.Models;
 using Kavenegar.Core.Models.Enums;
@@ -8,65 +9,77 @@ namespace Kavenegar.Core;
 
 public interface IKavenegarApi2
 {
-    string ApiKey { set; get; }
+    Task<SendResult?> Send(
+        SendSingleMessageRequest message,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> Send(
-        SendMessageRequest message,
-        DateTime? date);
-
-    Task<List<SendResult>> SendArray(
-        List<SendMessageRequest> messages,
-        DateTime? date);
+        SendMultiMessageRequest messages,
+        CancellationToken cancellationToken = default);
 
     Task<StatusResult> Status(
-        string messageId);
+        string messageId,
+        CancellationToken cancellationToken = default);
 
     Task<List<StatusResult>> Status(
-        List<string> messageIds);
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
     Task<StatusLocalMessageIdResult> StatusLocalMessageId(
-        string messageId);
+        string messageId,
+        CancellationToken cancellationToken = default);
 
     Task<List<StatusLocalMessageIdResult>> StatusLocalMessageId(
-        List<string> messageIds);
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
     Task<SendResult> Select(
-        string messageId);
+        string messageId,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> Select(
-        List<string> messageIds);
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> SelectOutbox(
         DateTime startDate,
         DateTime? endDate,
-        string? sender);
+        string? sender,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> LatestOutbox(
         long? pageSize,
-        string? sender);
+        string? sender,
+        CancellationToken cancellationToken = default);
 
     Task<CountOutboxResult> CountOutbox(
         DateTime startDate,
         DateTime? endDate,
-        int? status);
+        int? status,
+        CancellationToken cancellationToken = default);
 
     Task<StatusResult> Cancel(
-        string messageId);
+        string messageId,
+        CancellationToken cancellationToken = default);
 
     Task<List<StatusResult>> Cancel(
-        List<string> ids);
+        List<string> ids,
+        CancellationToken cancellationToken = default);
 
     Task<List<ReceiveResult>> Receive(
         string line,
-        int isRead);
+        bool isRead,
+        CancellationToken cancellationToken = default);
 
     Task<CountInboxResult> CountInbox(
         DateTime startDate,
         DateTime? endDate,
         string? lineNumber,
-        int? isRead);
+        bool? isRead,
+        CancellationToken cancellationToken = default);
 
-    Task<AccountInfoResult> AccountInfo();
+    Task<AccountInfoResult> AccountInfo(
+        CancellationToken cancellationToken = default);
 
     Task<AccountConfigResult> AccountConfig(
         string apiLogs,
@@ -74,15 +87,17 @@ public interface IKavenegarApi2
         string debugMode,
         string defaultSender,
         int? minCreditAlarm,
-        string resendFailed);
+        string resendFailed,
+        CancellationToken cancellationToken = default);
 
     Task<SendResult> VerifyLookup(
         string receptor,
         string template,
         string token1,
-        string? token2,
-        string? token3,
-        string? token4,
-        string? token5,
-        VerifyLookupType? type);
+        string? token2 = null,
+        string? token3 = null,
+        string? token4 = null,
+        string? token5 = null,
+        VerifyLookupType? type = null,
+        CancellationToken cancellationToken = default);
 }

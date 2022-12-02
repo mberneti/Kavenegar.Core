@@ -7,7 +7,7 @@ public class ReceiveResult
 {
     public long Date { get; set; }
 
-    public DateTime GregorianDate => DateHelper.UnixTimestampToDateTime(Date);
+    public DateTime GregorianDate => Date.ToDateTime();
 
     public long MessageId { get; set; }
 

@@ -1,4 +1,6 @@
-﻿namespace Kavenegar.Core;
+﻿using Kavenegar.Core.Models;
+
+namespace Kavenegar.Core;
 
 internal class ReturnResult
 {

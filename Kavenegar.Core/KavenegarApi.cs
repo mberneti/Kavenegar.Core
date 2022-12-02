@@ -31,37 +31,6 @@ public class KavenegarApi : IKavenegarApi
 
     public string ApiKey { set; get; }
 
-    private string GetApiPath(
-        string @base,
-        string method,
-        string output)
-    {
-        return string.Format(
-            ApiPath,
-            @base,
-            method,
-            output);
-    }
-
-    private async Task<string> Execute(
-        string path,
-        Dictionary<string, object> @params)
-    {
-        var nvc = @params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
-
-        var postdata = new FormUrlEncodedContent(nvc);
-
-        var response = await _client.PostAsync(path, postdata);
-        var responseBody = await response.Content.ReadAsStringAsync();
-
-        var result = JsonConvert.DeserializeObject<ReturnResult>(responseBody);
-
-        if (response.StatusCode != HttpStatusCode.OK)
-            throw new ApiException(result.Return.message, result.Return.status);
-
-        return responseBody;
-    }
-
     public async Task<List<SendResult>> Send(
         string sender,
         List<string> receptor,
@@ -207,7 +176,7 @@ public class KavenegarApi : IKavenegarApi
                 "type", (int)type
             },
             {
-                "date", date == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(date)
+                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
             }
         };
         if (localIds != null &&
@@ -344,7 +313,7 @@ public class KavenegarApi : IKavenegarApi
                 "type", jsonTypes
             },
             {
-                "date", date == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(date)
+                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
             }
         };
         if (localMessageIds != null &&
@@ -474,10 +443,10 @@ public class KavenegarApi : IKavenegarApi
         var param = new Dictionary<string, object>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(startDate)
+                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
             },
             {
-                "endDate", endDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(endDate)
+                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
             },
             {
                 "sender", sender
@@ -547,10 +516,10 @@ public class KavenegarApi : IKavenegarApi
         var param = new Dictionary<string, object>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(startDate)
+                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
             },
             {
-                "endDate", endDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(endDate)
+                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
             },
             {
                 "status", status
@@ -652,10 +621,10 @@ public class KavenegarApi : IKavenegarApi
         var param = new Dictionary<string, object>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(startDate)
+                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
             },
             {
-                "endDate", endDate == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(endDate)
+                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
             },
             {
                 "lineNumber", lineNumber
@@ -745,7 +714,7 @@ public class KavenegarApi : IKavenegarApi
                 "mtnCount", mtnCount
             },
             {
-                "date", date == DateTime.MinValue ? 0 : DateHelper.DateTimeToUnixTimestamp(date)
+                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
             }
         };
         var responsebody = await Execute(path, param);
@@ -949,6 +918,37 @@ public class KavenegarApi : IKavenegarApi
         return l.entries[0];
     }
 
+    private string GetApiPath(
+        string @base,
+        string method,
+        string output)
+    {
+        return string.Format(
+            ApiPath,
+            @base,
+            method,
+            output);
+    }
+
+    private async Task<string> Execute(
+        string path,
+        Dictionary<string, object> @params)
+    {
+        var nvc = @params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
+
+        var postdata = new FormUrlEncodedContent(nvc);
+
+        var response = await _client.PostAsync(path, postdata);
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<ReturnResult>(responseBody);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new ApiException(result.Return.Message, result.Return.Status);
+
+        return responseBody;
+    }
+
 
     #region << CallMakeTts >>
 
@@ -996,7 +996,7 @@ public class KavenegarApi : IKavenegarApi
                 "message", WebUtility.HtmlEncode(message)
             }
         };
-        if (date != null) param.Add("date", DateHelper.DateTimeToUnixTimestamp(date.Value));
+        if (date != null) param.Add("date", date.Value.ToUnixTimestamp());
         if (localId != null &&
             localId.Count > 0)
             param.Add("localId", string.Join(",", localId));

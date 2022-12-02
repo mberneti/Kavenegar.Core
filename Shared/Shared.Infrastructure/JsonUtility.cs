@@ -6,7 +6,7 @@ namespace Shared.Infrastructure;
 public static class JsonUtility
 {
     public static async Task<string> Serialize<T>(
-        T obj,
+        this T obj,
         CancellationToken cancellationToken = default)
     {
         var stream = new MemoryStream();
@@ -14,8 +14,9 @@ public static class JsonUtility
             stream,
             obj,
             cancellationToken: cancellationToken);
-        var sr = new StreamReader(stream, Encoding.UTF8);
-        return await sr.ReadToEndAsync();
+
+        var streamReader = new StreamReader(stream, Encoding.UTF8);
+        return await streamReader.ReadToEndAsync();
     }
 
     public static async Task<T?> Deserialize<T>(
@@ -23,5 +24,16 @@ public static class JsonUtility
         CancellationToken cancellationToken = default)
     {
         return await JsonSerializer.DeserializeAsync<T>(json, cancellationToken: cancellationToken);
+    }
+
+    public static async Task<T?> Deserialize<T>(
+        this HttpResponseMessage httpResponseMessage,
+        CancellationToken cancellationToken = default)
+    {
+        var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+        var stream = new MemoryStream();
+        var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+        await streamWriter.WriteAsync(content);
+        return await Deserialize<T>(stream, cancellationToken);
     }
 }
