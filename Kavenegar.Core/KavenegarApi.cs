@@ -1,892 +1,467 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Kavenegar.Core.Exceptions;
-using Kavenegar.Core.Models;
-using Kavenegar.Core.Models.Enums;
-using Kavenegar.Core.Utils;
-using Newtonsoft.Json;
+﻿using System.Net;
+using Kavenegar.Core.Dto.Message;
+using Kavenegar.Core.Dto.Result;
+using Kavenegar.Core.Enums;
+using Shared.Infrastructure;
 
 namespace Kavenegar.Core;
 
-public class KavenegarApi : IKavenegarApi
+internal class KavenegarApi : IKavenegarApi
 {
-    private const string ApiPath = "{0}/{1}.{2}";
-    private const string BaseUrl = "http://api.kavenegar.com/v1";
-    private static HttpClient _client = null!;
+    private readonly HttpClientHelper _httpClientHelper;
 
     public KavenegarApi(
-        string apikey)
+        string apiKey)
     {
-        ApiKey = apikey;
-
-        _client = new HttpClient
+        _httpClientHelper = new HttpClientHelper
         {
-            BaseAddress = new Uri($"{BaseUrl}/{ApiKey}/")
+            BaseAddress = $"https://api.kavenegar.com/v1/{apiKey}"
         };
     }
 
-    public string ApiKey { set; get; }
-
-    public async Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message)
+    public async Task<SendResult?> Send(
+        SendSingleMessageRequest message,
+        CancellationToken cancellationToken = default)
     {
-        return await Send(
-            sender,
-            receptor,
-            message,
-            MessageType.MobileMemory,
-            DateTime.MinValue);
-    }
-
-    public async Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message)
-    {
-        return await Send(
-            sender,
-            receptor,
-            message,
-            MessageType.MobileMemory,
-            DateTime.MinValue);
-    }
-
-    public async Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        MessageType type,
-        DateTime date)
-    {
-        var receptors = new List<string>
+        var queryParams = new Dictionary<string, object?>
         {
-            receptor
+            {
+                "sender", message.MessageInfo.Sender
+            },
+            {
+                "receptor", string.Join(',', message.ReceptorLocalMessageIds.Keys)
+            },
+            {
+                "message", message.MessageInfo.Message
+            },
+            {
+                "type", (int)message.MessageInfo.Type
+            },
+            {
+                "date", message.Date?.ToUnixTimestamp() ?? 0
+            }
         };
-        return (await Send(
-            sender,
-            receptors,
-            message,
-            type,
-            date))[0];
+
+        if (message.ReceptorLocalMessageIds.Values.All(string.IsNullOrWhiteSpace))
+            queryParams.Add("localId", string.Join(',', message.ReceptorLocalMessageIds.Values));
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/sendarray.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))!.Value
+            .FirstOrDefault();
     }
 
     public async Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message,
-        MessageType type,
-        DateTime date)
+        SendMultiMessageRequest messages,
+        CancellationToken cancellationToken = default)
     {
-        return await Send(
-            sender,
-            receptor,
-            message,
-            type,
-            date,
-            null);
-    }
-
-    public async Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        MessageType type,
-        DateTime date,
-        string localId)
-    {
-        var receptors = new List<string>
-        {
-            receptor
-        };
-        var localIds = new List<string>
-        {
-            localId
-        };
-        return (await Send(
-            sender,
-            receptors,
-            message,
-            type,
-            date,
-            localIds))[0];
-    }
-
-    public async Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        string localId)
-    {
-        return await Send(
-            sender,
-            receptor,
-            message,
-            MessageType.MobileMemory,
-            DateTime.MinValue,
-            localId);
-    }
-
-    public async Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptors,
-        string message,
-        string localId)
-    {
-        var localIds = new List<string>();
-        for (var i = 0; i <= receptors.Count - 1; i++) localIds.Add(localId);
-        return await Send(
-            sender,
-            receptors,
-            message,
-            MessageType.MobileMemory,
-            DateTime.MinValue,
-            localIds);
-    }
-
-    public async Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message,
-        MessageType type,
-        DateTime date,
-        List<string> localIds)
-    {
-        var path = GetApiPath(
-            "sms",
-            "send",
-            "json");
-        var param = new Dictionary<string, object>
+        var requestParams = new Dictionary<string, object?>
         {
             {
-                "sender", WebUtility.HtmlEncode(sender)
+                "message",
+                await messages.SendMessageInfos
+                    .Select(sendMessageInfo => WebUtility.HtmlEncode(sendMessageInfo.MessageInfo.Message))
+                    .ToList()
+                    .Serialize(cancellationToken)
             },
             {
-                "receptor", WebUtility.HtmlEncode(string.Join(",", receptor))
+                "sender",
+                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Sender)
+                    .ToList()
+                    .Serialize(cancellationToken)
             },
             {
-                "message", message
+                "receptor",
+                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.Receptor)
+                    .ToList()
+                    .Serialize(cancellationToken)
             },
             {
-                "type", (int)type
+                "type",
+                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Type.ToString())
+                    .Serialize(cancellationToken)
             },
             {
-                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
+                "date", messages.Date == DateTime.MinValue ? 0 : messages.Date.ToUnixTimestamp()
             }
         };
-        if (localIds != null &&
-            localIds.Count > 0)
-            param.Add("localId", string.Join(",", localIds));
-        var responseBody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responseBody);
-        return l.entries;
+
+        if (messages.SendMessageInfos.All(
+                sendMessageInfo => !string.IsNullOrWhiteSpace(sendMessageInfo.LocalMessageId)))
+            requestParams.Add(
+                "localMessageIds",
+                string.Join(
+                    ",",
+                    messages.SendMessageInfos.Select(
+                        sendMessageInfo => !string.IsNullOrWhiteSpace(sendMessageInfo.LocalMessageId))));
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/send.json",
+            null,
+            requestParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))!.Value;
     }
 
-    public async Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages)
+    public async Task<StatusMessageDto> Status(
+        string messageId,
+        CancellationToken cancellationToken = default)
     {
-        var types = new List<MessageType>();
-        for (var i = 0; i <= senders.Count - 1; i++) types.Add(MessageType.MobileMemory);
-        return await SendArray(
-            senders,
-            receptors,
-            messages,
-            types,
-            DateTime.MinValue,
-            null);
-    }
-
-    public async Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        MessageType type,
-        DateTime date)
-    {
-        var senders = new List<string>();
-        for (var i = 0; i < receptors.Count; i++) senders.Add(sender);
-        var types = new List<MessageType>();
-        for (var i = 0; i <= senders.Count - 1; i++) types.Add(MessageType.MobileMemory);
-        return await SendArray(
-            senders,
-            receptors,
-            messages,
-            types,
-            date,
-            null);
-    }
-
-    public async Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        MessageType type,
-        DateTime date,
-        string localMessageIds)
-    {
-        var senders = new List<string>();
-        for (var i = 0; i < receptors.Count; i++) senders.Add(sender);
-        var types = new List<MessageType>();
-        for (var i = 0; i <= senders.Count - 1; i++) types.Add(MessageType.MobileMemory);
-        return await SendArray(
-            senders,
-            receptors,
-            messages,
-            types,
-            date,
-            new List<string>
-            {
-                localMessageIds
-            });
-    }
-
-    public async Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        string localMessageId)
-    {
-        var senders = new List<string>();
-        for (var i = 0; i < receptors.Count; i++) senders.Add(sender);
-
-        return await SendArray(
-            senders,
-            receptors,
-            messages,
-            localMessageId);
-    }
-
-    public async Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages,
-        string localMessageId)
-    {
-        var types = new List<MessageType>();
-        for (var i = 0; i <= receptors.Count - 1; i++) types.Add(MessageType.MobileMemory);
-        var localMessageIds = new List<string>();
-        for (var i = 0; i <= receptors.Count - 1; i++) localMessageIds.Add(localMessageId);
-        return await SendArray(
-            senders,
-            receptors,
-            messages,
-            types,
-            DateTime.MinValue,
-            localMessageIds);
-    }
-
-    public async Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages,
-        List<MessageType> types,
-        DateTime date,
-        List<string> localMessageIds)
-    {
-        var path = GetApiPath(
-            "sms",
-            "sendarray",
-            "json");
-        var jsonSenders = JsonConvert.SerializeObject(senders);
-        var jsonReceptors = JsonConvert.SerializeObject(receptors);
-        var jsonMessages = JsonConvert.SerializeObject(messages);
-        var jsonTypes = JsonConvert.SerializeObject(types);
-        var param = new Dictionary<string, object>
-        {
-            {
-                "message", jsonMessages
-            },
-            {
-                "sender", jsonSenders
-            },
-            {
-                "receptor", jsonReceptors
-            },
-            {
-                "type", jsonTypes
-            },
-            {
-                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
-            }
-        };
-        if (localMessageIds != null &&
-            localMessageIds.Count > 0)
-            param.Add("localMessageIds", string.Join(",", localMessageIds));
-
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        if (l.entries == null) return new List<SendResult>();
-        return l.entries;
-    }
-
-    public async Task<List<StatusResult>> Status(
-        List<string> messageIds)
-    {
-        var path = GetApiPath(
-            "sms",
-            "status",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "messageId", string.Join(",", messageIds)
-            }
-        };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnStatus>(responsebody);
-        if (l.entries == null) return new List<StatusResult>();
-        return l.entries;
-    }
-
-    public async Task<StatusResult> Status(
-        string messageId)
-    {
-        var ids = new List<string>
-        {
-            messageId
-        };
-        var result = await Status(ids);
-        return result.Count == 1 ? result[0] : null;
-    }
-
-    public async Task<List<StatusLocalMessageIdResult>> StatusLocalMessageId(
-        List<string> messageIds)
-    {
-        var path = GetApiPath(
-            "sms",
-            "statuslocalmessageid",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "localId", string.Join(",", messageIds)
-            }
-        };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnStatusLocalMessageId>(responsebody);
-        return l.entries;
-    }
-
-    public async Task<StatusLocalMessageIdResult> StatusLocalMessageId(
-        string messageId)
-    {
-        var result = await StatusLocalMessageId(
+        return (await Status(
             new List<string>
             {
                 messageId
-            });
-        return result.Count == 1 ? result[0] : null;
+            },
+            cancellationToken)).FirstOrDefault()!;
     }
 
-    public async Task<List<SendResult>> Select(
-        List<string> messageIds)
+    public async Task<List<StatusMessageDto>> Status(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default)
     {
-        var path = GetApiPath(
-            "sms",
-            "select",
-            "json");
-        var param = new Dictionary<string, object>
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "messageId", string.Join(",", messageIds)
+                "messageid", string.Join(',', messageIds)
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        if (l.entries == null) return new List<SendResult>();
-        return l.entries;
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/status.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<StatusMessageDto>>>(cancellationToken))?.Value ??
+               new List<StatusMessageDto>();
+    }
+
+    public async Task<LocalStatusDto> StatusLocalMessageId(
+        string messageId,
+        CancellationToken cancellationToken = default)
+    {
+        return (await StatusLocalMessageId(
+            new List<string>
+            {
+                messageId
+            },
+            cancellationToken)).FirstOrDefault()!;
+    }
+
+    public async Task<List<LocalStatusDto>> StatusLocalMessageId(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default)
+    {
+        var queryParams = new Dictionary<string, object?>
+        {
+            {
+                "messageid", string.Join(',', messageIds)
+            }
+        };
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/statuslocalmessageid.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<LocalStatusDto>>>(cancellationToken))?.Value ??
+               new List<LocalStatusDto>();
     }
 
     public async Task<SendResult> Select(
-        string messageId)
+        string messageId,
+        CancellationToken cancellationToken = default)
     {
-        var ids = new List<string>
-        {
-            messageId
-        };
-        var result = await Select(ids);
-        return result.Count == 1 ? result[0] : null;
+        return (await Select(
+            new List<string>
+            {
+                messageId
+            },
+            cancellationToken)).FirstOrDefault()!;
     }
 
-    public async Task<List<SendResult>> SelectOutbox(
-        DateTime startDate)
+    public async Task<List<SendResult>> Select(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default)
     {
-        return await SelectOutbox(startDate, DateTime.MaxValue);
-    }
-
-    public async Task<List<SendResult>> SelectOutbox(
-        DateTime startDate,
-        DateTime endDate)
-    {
-        return await SelectOutbox(
-            startDate,
-            endDate,
-            null);
-    }
-
-    public async Task<List<SendResult>> SelectOutbox(
-        DateTime startDate,
-        DateTime endDate,
-        string sender)
-    {
-        var path = GetApiPath(
-            "sms",
-            "selectoutbox",
-            "json");
-        var param = new Dictionary<string, object>
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
-            },
-            {
-                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
-            },
-            {
-                "sender", sender
+                "messageid", string.Join(',', messageIds)
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        return l.entries;
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/select.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))?.Value ??
+               new List<SendResult>();
+    }
+
+    public async Task<List<SendResult>> SelectOutbox(
+        DateTime startDate,
+        DateTime? endDate,
+        string? sender,
+        CancellationToken cancellationToken = default)
+    {
+        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
+
+        if ((endDate - startDate)!.Value.TotalDays > 1)
+            throw new ArgumentException(
+                "حداکثر فاصله زمانی بین متغیر startDate تا متغیر endDate برابر با 1 روز می باشد.");
+
+        if (startDate < DateTime.Now.AddDays(-60))
+            throw new ArgumentException("تاریخ شروع startDate حداکثر باید تا 60 روز قبل باشد.");
+
+        var queryParams = new Dictionary<string, object?>
+        {
+            {
+                "startdate", startDate.ToUnixTimestamp()
+            }
+        };
+
+        if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
+
+        if (string.IsNullOrWhiteSpace(sender)) queryParams.Add("sender", sender);
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/selectoutbox.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))?.Value ??
+               new List<SendResult>();
     }
 
     public async Task<List<SendResult>> LatestOutbox(
-        long pageSize)
+        long? pageSize,
+        string? sender,
+        CancellationToken cancellationToken = default)
     {
-        return await LatestOutbox(pageSize, "");
-    }
+        if (pageSize is > 500) throw new ArgumentException("تعداد رکورد های خروجی این متد حداکثر 500 رکورد می‌باشد.");
 
-    public async Task<List<SendResult>> LatestOutbox(
-        long pageSize,
-        string sender)
-    {
-        var path = GetApiPath(
-            "sms",
-            "latestoutbox",
-            "json");
-        var param = new Dictionary<string, object>
+        pageSize ??= 500;
+
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "pageSize", pageSize
-            },
-            {
-                "sender", sender
+                "pagesize", pageSize
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        return l.entries;
+
+        if (string.IsNullOrWhiteSpace(sender)) queryParams.Add("sender", sender);
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/latestoutbox.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))?.Value ??
+               new List<SendResult>();
     }
 
-    public async Task<CountOutboxResult> CountOutbox(
-        DateTime startDate)
-    {
-        return await CountOutbox(
-            startDate,
-            DateTime.MaxValue,
-            10);
-    }
-
-    public async Task<CountOutboxResult> CountOutbox(
+    public async Task<CountOutboxDto> CountOutbox(
         DateTime startDate,
-        DateTime endDate)
+        DateTime? endDate,
+        int? status,
+        CancellationToken cancellationToken = default)
     {
-        return await CountOutbox(
-            startDate,
-            endDate,
-            0);
-    }
+        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
 
-    public async Task<CountOutboxResult> CountOutbox(
-        DateTime startDate,
-        DateTime endDate,
-        int status)
-    {
-        var path = GetApiPath(
-            "sms",
-            "countoutbox",
-            "json");
-        var param = new Dictionary<string, object>
+        if ((endDate - startDate)!.Value.TotalDays > 1)
+            throw new ArgumentException(
+                "حداکثر فاصله زمانی بین متغیر startdate تا متغیر endDate برابر با 1 روز می باشد.");
+
+        if (startDate < DateTime.Now.AddDays(-60))
+            throw new ArgumentException("تاریخ شروع startdate حداکثر باید تا 60 روز قبل باشد.");
+
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
-            },
-            {
-                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
-            },
-            {
-                "status", status
+                "startdate", startDate.ToUnixTimestamp()
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnCountOutbox>(responsebody);
-        if (l.entries == null ||
-            l.entries[0] == null)
-            return new CountOutboxResult();
-        return l.entries[0];
+
+        if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
+
+        if (status.HasValue) queryParams.Add("status", status);
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/countoutbox.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<CountOutboxDto>>>(cancellationToken))?.Value
+               .FirstOrDefault() ??
+               new CountOutboxDto();
     }
 
-    public async Task<List<StatusResult>> Cancel(
-        List<string> ids)
+    public async Task<StatusMessageDto> Cancel(
+        string messageId,
+        CancellationToken cancellationToken = default)
     {
-        var path = GetApiPath(
-            "sms",
-            "cancel",
-            "json");
-        var param = new Dictionary<string, object>
+        return (await Cancel(
+            new List<string>
+            {
+                messageId
+            },
+            cancellationToken)).FirstOrDefault()!;
+    }
+
+    public async Task<List<StatusMessageDto>> Cancel(
+        List<string> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "messageId", string.Join(",", ids)
+                "messageid", string.Join(',', ids)
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnStatus>(responsebody);
-        return l.entries;
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/cancel.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<StatusMessageDto>>>(cancellationToken))?.Value ??
+               new List<StatusMessageDto>();
     }
 
-    public async Task<StatusResult> Cancel(
-        string messageId)
-    {
-        var ids = new List<string>
-        {
-            messageId
-        };
-        var result = await Cancel(ids);
-        return result.Count == 1 ? result[0] : null;
-    }
-
-    public async Task<List<ReceiveResult>> Receive(
+    public async Task<List<ReceivedMessageDto>> Receive(
         string line,
-        int isRead)
+        bool isRead,
+        CancellationToken cancellationToken = default)
     {
-        var path = GetApiPath(
-            "sms",
-            "receive",
-            "json");
-        var param = new Dictionary<string, object>
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "lineNumber", line
+                "linenumber", line
             },
             {
-                "isRead", isRead
+                "isread", isRead ? 1 : 0
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnReceive>(responsebody);
-        if (l.entries == null) return new List<ReceiveResult>();
-        return l.entries;
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/receive.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<ReceivedMessageDto>>>(cancellationToken))?.Value ??
+               new List<ReceivedMessageDto>();
     }
 
-    public async Task<CountInboxResult> CountInbox(
+    public async Task<CountInboxDto> CountInbox(
         DateTime startDate,
-        string lineNumber)
+        DateTime? endDate,
+        string? lineNumber,
+        bool? isRead,
+        CancellationToken cancellationToken = default)
     {
-        return await CountInbox(
-            startDate,
-            DateTime.MaxValue,
-            lineNumber,
-            0);
-    }
+        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
 
-    public async Task<CountInboxResult> CountInbox(
-        DateTime startDate,
-        DateTime endDate,
-        string lineNumber)
-    {
-        return await CountInbox(
-            startDate,
-            endDate,
-            lineNumber,
-            0);
-    }
+        if ((endDate - startDate)!.Value.TotalDays > 1)
+            throw new ArgumentException(
+                "حداکثر فاصله زمانی بین متغیر startdate تا متغیر endDate برابر با 1 روز می باشد.");
 
-    public async Task<CountInboxResult> CountInbox(
-        DateTime startDate,
-        DateTime endDate,
-        string lineNumber,
-        int isRead)
-    {
-        var path = GetApiPath(
-            "sms",
-            "countoutbox",
-            "json");
-        var param = new Dictionary<string, object>
+        if (startDate < DateTime.Now.AddDays(-60))
+            throw new ArgumentException("تاریخ شروع startdate حداکثر باید تا 60 روز قبل باشد.");
+
+        var queryParams = new Dictionary<string, object?>
         {
             {
-                "startDate", startDate == DateTime.MinValue ? 0 : startDate.ToUnixTimestamp()
-            },
-            {
-                "endDate", endDate == DateTime.MinValue ? 0 : endDate.ToUnixTimestamp()
-            },
-            {
-                "lineNumber", lineNumber
-            },
-            {
-                "isRead", isRead
+                "startdate", startDate.ToUnixTimestamp()
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnCountInbox>(responsebody);
-        return l.entries[0];
+
+        if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
+        if (string.IsNullOrWhiteSpace(lineNumber)) queryParams.Add("linenumber", lineNumber);
+        if (isRead.HasValue) queryParams.Add("isread", isRead.Value ? 1 : 0);
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "sms/countinbox.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<CountInboxDto>>>(cancellationToken))?.Value
+               .FirstOrDefault() ??
+               new CountOutboxDto();
     }
 
-    public async Task<List<CountPostalCodeResult>> CountPostalCode(
-        long postalcode)
+    public async Task<AccountInfoDto> AccountInfo(
+        CancellationToken cancellationToken = default)
     {
-        var path = GetApiPath(
-            "sms",
-            "countpostalcode",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "postalcode", postalcode
-            }
-        };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnCountPostalCode>(responsebody);
-        return l.entries;
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "account/info.json",
+            null,
+            null,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<AccountInfoDto>>(cancellationToken))?.Value ??
+               new AccountInfoDto();
     }
 
-    public async Task<List<SendResult>> SendByPostalCode(
-        long postalcode,
-        string sender,
-        string message,
-        long mciStartIndex,
-        long mciCount,
-        long mtnStartIndex,
-        long mtnCount)
-    {
-        return await SendByPostalCode(
-            postalcode,
-            sender,
-            message,
-            mciStartIndex,
-            mciCount,
-            mtnStartIndex,
-            mtnCount,
-            DateTime.MinValue);
-    }
-
-    public async Task<List<SendResult>> SendByPostalCode(
-        long postalcode,
-        string sender,
-        string message,
-        long mciStartIndex,
-        long mciCount,
-        long mtnStartIndex,
-        long mtnCount,
-        DateTime date)
-    {
-        var path = GetApiPath(
-            "sms",
-            "sendbypostalcode",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "postalcode", postalcode
-            },
-            {
-                "sender", sender
-            },
-            {
-                "message", WebUtility.HtmlEncode(message)
-            },
-            {
-                "mciStartIndex", mciStartIndex
-            },
-            {
-                "mciCount", mciCount
-            },
-            {
-                "mtnStartIndex", mtnStartIndex
-            },
-            {
-                "mtnCount", mtnCount
-            },
-            {
-                "date", date == DateTime.MinValue ? 0 : date.ToUnixTimestamp()
-            }
-        };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        return l.entries;
-    }
-
-    public async Task<AccountInfoResult> AccountInfo()
-    {
-        var path = GetApiPath(
-            "account",
-            "info",
-            "json");
-        var responsebody = await Execute(path, null);
-        var l = JsonConvert.DeserializeObject<ReturnAccountInfo>(responsebody);
-        return l.entries;
-    }
-
-    public async Task<AccountConfigResult> AccountConfig(
-        string apiLogs,
-        string dailyReport,
-        string debugMode,
-        string defaultSender,
+    public async Task<AccountConfigDto> AccountConfig(
+        string? apiLogs,
+        string? dailyReport,
+        string? debugMode,
+        string? defaultSender,
         int? minCreditAlarm,
-        string resendFailed)
+        string? resendFailed,
+        CancellationToken cancellationToken = default)
     {
-        var path = GetApiPath(
-            "account",
-            "config",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "apiLogs", apiLogs
-            },
-            {
-                "dailyReport", dailyReport
-            },
-            {
-                "debugMode", debugMode
-            },
-            {
-                "defaultSender", defaultSender
-            },
-            {
-                "minCreditAlarm", minCreditAlarm
-            },
-            {
-                "resendFailed", resendFailed
-            }
-        };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnAccountConfig>(responsebody);
-        return l.entries;
+        var queryParams = new Dictionary<string, object?>();
+
+        if (string.IsNullOrWhiteSpace(apiLogs)) queryParams.Add("apilogs", apiLogs);
+
+        if (string.IsNullOrWhiteSpace(dailyReport)) queryParams.Add("dailyreport", dailyReport);
+
+        if (string.IsNullOrWhiteSpace(debugMode)) queryParams.Add("debugmode", debugMode);
+
+        if (string.IsNullOrWhiteSpace(defaultSender)) queryParams.Add("defaultsender", defaultSender);
+
+        queryParams.Add("mincreditalarm", minCreditAlarm);
+
+        if (string.IsNullOrWhiteSpace(resendFailed)) queryParams.Add("resendfailed", resendFailed);
+
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "account/config.json",
+            null,
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<AccountConfigDto>>(cancellationToken))?.Value ??
+               new AccountConfigDto();
     }
 
     public async Task<SendResult> VerifyLookup(
         string receptor,
-        string token,
-        string template)
-    {
-        return await VerifyLookup(
-            receptor,
-            token,
-            null,
-            null,
-            template,
-            VerifyLookupType.Sms);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
         string template,
-        VerifyLookupType type)
+        string token1,
+        string? token2 = null,
+        string? token3 = null,
+        string? token4 = null,
+        string? token5 = null,
+        VerifyLookupType? type = null,
+        CancellationToken cancellationToken = default)
     {
-        return await VerifyLookup(
-            receptor,
-            token,
-            null,
-            null,
-            template,
-            type);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string template)
-    {
-        return await VerifyLookup(
-            receptor,
-            token,
-            token2,
-            token3,
-            template,
-            VerifyLookupType.Sms);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string template)
-    {
-        return await VerifyLookup(
-            receptor,
-            token,
-            token2,
-            token3,
-            token10,
-            template,
-            VerifyLookupType.Sms);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string template,
-        VerifyLookupType type)
-    {
-        return await VerifyLookup(
-            receptor,
-            token,
-            token2,
-            token3,
-            null,
-            template,
-            type);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string template,
-        VerifyLookupType type)
-    {
-        return await VerifyLookup(
-            receptor,
-            token,
-            token2,
-            token3,
-            token10,
-            null,
-            template,
-            type);
-    }
-
-    public async Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string token20,
-        string template,
-        VerifyLookupType type)
-    {
-        var path = GetApiPath(
-            "verify",
-            "lookup",
-            "json");
-        var param = new Dictionary<string, object>
+        var queryParams = new Dictionary<string, object?>
         {
             {
                 "receptor", receptor
@@ -895,115 +470,28 @@ public class KavenegarApi : IKavenegarApi
                 "template", template
             },
             {
-                "token", token
-            },
-            {
-                "token2", token2
-            },
-            {
-                "token3", token3
-            },
-            {
-                "token10", token10
-            },
-            {
-                "token20", token20
-            },
-            {
-                "type", type
+                "token", token1
             }
         };
-        var responsebody = await Execute(path, param);
-        var l = JsonConvert.DeserializeObject<ReturnSend>(responsebody);
-        return l.entries[0];
-    }
 
-    private string GetApiPath(
-        string @base,
-        string method,
-        string output)
-    {
-        return string.Format(
-            ApiPath,
-            @base,
-            method,
-            output);
-    }
+        if (string.IsNullOrWhiteSpace(token2)) queryParams.Add("token2", token2);
 
-    private async Task<string> Execute(
-        string path,
-        Dictionary<string, object> @params)
-    {
-        var nvc = @params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
+        if (string.IsNullOrWhiteSpace(token3)) queryParams.Add("token3", token3);
 
-        var postdata = new FormUrlEncodedContent(nvc);
+        if (string.IsNullOrWhiteSpace(token4)) queryParams.Add("token10", token4);
 
-        var response = await _client.PostAsync(path, postdata);
-        var responseBody = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(token5)) queryParams.Add("token20", token5);
 
-        var result = JsonConvert.DeserializeObject<ReturnResult>(responseBody);
+        if (type.HasValue) queryParams.Add("type", type.Value.ToString());
 
-        if (response.StatusCode != HttpStatusCode.OK)
-            throw new ApiException(result.Return.Message, result.Return.Status);
-
-        return responseBody;
-    }
-
-
-    #region << CallMakeTts >>
-
-    public async Task<SendResult> CallMakeTts(
-        string message,
-        string receptor)
-    {
-        return (await CallMakeTts(
-            message,
-            new List<string>
-            {
-                receptor
-            },
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
+            "verify/lookup.json",
             null,
-            null))[0];
+            queryParams,
+            cancellationToken);
+
+        return (await httpResponseMessage.Deserialize<ResultDto<List<SendResult>>>(cancellationToken))?.Value
+               .FirstOrDefault() ??
+               new SendResult();
     }
-
-    public async Task<List<SendResult>> CallMakeTts(
-        string message,
-        List<string> receptor)
-    {
-        return await CallMakeTts(
-            message,
-            receptor,
-            null,
-            null);
-    }
-
-    public async Task<List<SendResult>> CallMakeTts(
-        string message,
-        List<string> receptor,
-        DateTime? date,
-        List<string> localId)
-    {
-        var path = GetApiPath(
-            "call",
-            "maketts",
-            "json");
-        var param = new Dictionary<string, object>
-        {
-            {
-                "receptor", string.Join(",", receptor)
-            },
-            {
-                "message", WebUtility.HtmlEncode(message)
-            }
-        };
-        if (date != null) param.Add("date", date.Value.ToUnixTimestamp());
-        if (localId != null &&
-            localId.Count > 0)
-            param.Add("localId", string.Join(",", localId));
-        var responseBody = await Execute(path, param);
-
-        return JsonConvert.DeserializeObject<ReturnSend>(responseBody).entries;
-    }
-
-    #endregion << CallMakeTts >>
 }

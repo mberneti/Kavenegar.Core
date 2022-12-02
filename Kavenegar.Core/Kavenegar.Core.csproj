@@ -1,37 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>1.0.5</Version>
-        <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
-        <RootNamespace>Kavenegar.Core</RootNamespace>
-        <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
-
-        <PackageId>KavenegarDotNetCore</PackageId>
-        <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore Sms</PackageTags>
-        <PackageProjectUrl>https://github.com/kavenegar/Kavenegar.Core</PackageProjectUrl>
-
-        <OutputType>Library</OutputType>
-        <RestorePackages>true</RestorePackages>
-        <BuildPackage>true</BuildPackage>
-        <Authors>HadiEskandari Ardavan HosseinRezaei Mberneti MohammadAmirriazi</Authors>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/kavenegar/Kavenegar.Core</RepositoryUrl>
-        <Company>Kavenegar</Company>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <LangVersion>11</LangVersion>
-        <Nullable>enable</Nullable>
         <TargetFramework>net6.0</TargetFramework>
-
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="12.0.0"/>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
+      <ProjectReference Include="..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

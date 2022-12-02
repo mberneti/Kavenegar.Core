@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Kavenegar.Core.Dto.Message;
+using Kavenegar.Core.Dto.Result;
+using Kavenegar.Core.Enums;
 using Kavenegar.Core.Models;
 using Kavenegar.Core.Models.Enums;
 
@@ -8,270 +8,95 @@ namespace Kavenegar.Core;
 
 public interface IKavenegarApi
 {
-    string ApiKey { set; get; }
+    Task<SendResult?> Send(
+        SendSingleMessageRequest message,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message);
+        SendMultiMessageRequest messages,
+        CancellationToken cancellationToken = default);
 
-    Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message);
+    Task<StatusMessageDto> Status(
+        string messageId,
+        CancellationToken cancellationToken = default);
 
-    Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        MessageType type,
-        DateTime date);
+    Task<List<StatusMessageDto>> Status(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
-    Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message,
-        MessageType type,
-        DateTime date);
+    Task<LocalStatusDto> StatusLocalMessageId(
+        string messageId,
+        CancellationToken cancellationToken = default);
 
-    Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        MessageType type,
-        DateTime date,
-        string localId);
-
-    Task<SendResult> Send(
-        string sender,
-        string receptor,
-        string message,
-        string localId);
-
-    Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptors,
-        string message,
-        string localId);
-
-    Task<List<SendResult>> Send(
-        string sender,
-        List<string> receptor,
-        string message,
-        MessageType type,
-        DateTime date,
-        List<string> localIds);
-
-    Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages);
-
-    Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        MessageType type,
-        DateTime date);
-
-    Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        MessageType type,
-        DateTime date,
-        string localMessageIds);
-
-    Task<List<SendResult>> SendArray(
-        string sender,
-        List<string> receptors,
-        List<string> messages,
-        string localMessageId);
-
-    Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages,
-        string localMessageId);
-
-    Task<List<SendResult>> SendArray(
-        List<string> senders,
-        List<string> receptors,
-        List<string> messages,
-        List<MessageType> types,
-        DateTime date,
-        List<string> localMessageIds);
-
-    Task<List<StatusResult>> Status(
-        List<string> messageIds);
-
-    Task<StatusResult> Status(
-        string messageId);
-
-    Task<List<StatusLocalMessageIdResult>> StatusLocalMessageId(
-        List<string> messageIds);
-
-    Task<StatusLocalMessageIdResult> StatusLocalMessageId(
-        string messageId);
-
-    Task<List<SendResult>> Select(
-        List<string> messageIds);
+    Task<List<LocalStatusDto>> StatusLocalMessageId(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
     Task<SendResult> Select(
-        string messageId);
+        string messageId,
+        CancellationToken cancellationToken = default);
 
-    Task<List<SendResult>> SelectOutbox(
-        DateTime startDate);
+    Task<List<SendResult>> Select(
+        List<string> messageIds,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> SelectOutbox(
         DateTime startDate,
-        DateTime endDate);
-
-    Task<List<SendResult>> SelectOutbox(
-        DateTime startDate,
-        DateTime endDate,
-        string sender);
+        DateTime? endDate,
+        string? sender,
+        CancellationToken cancellationToken = default);
 
     Task<List<SendResult>> LatestOutbox(
-        long pageSize);
+        long? pageSize,
+        string? sender,
+        CancellationToken cancellationToken = default);
 
-    Task<List<SendResult>> LatestOutbox(
-        long pageSize,
-        string sender);
-
-    Task<CountOutboxResult> CountOutbox(
-        DateTime startDate);
-
-    Task<CountOutboxResult> CountOutbox(
+    Task<CountOutboxDto> CountOutbox(
         DateTime startDate,
-        DateTime endDate);
+        DateTime? endDate,
+        int? status,
+        CancellationToken cancellationToken = default);
 
-    Task<CountOutboxResult> CountOutbox(
-        DateTime startDate,
-        DateTime endDate,
-        int status);
+    Task<StatusMessageDto> Cancel(
+        string messageId,
+        CancellationToken cancellationToken = default);
 
-    Task<List<StatusResult>> Cancel(
-        List<string> ids);
+    Task<List<StatusMessageDto>> Cancel(
+        List<string> ids,
+        CancellationToken cancellationToken = default);
 
-    Task<StatusResult> Cancel(
-        string messageId);
-
-    Task<List<ReceiveResult>> Receive(
+    Task<List<ReceivedMessageDto>> Receive(
         string line,
-        int isRead);
+        bool isRead,
+        CancellationToken cancellationToken = default);
 
-    Task<CountInboxResult> CountInbox(
+    Task<CountInboxDto> CountInbox(
         DateTime startDate,
-        string lineNumber);
+        DateTime? endDate,
+        string? lineNumber,
+        bool? isRead,
+        CancellationToken cancellationToken = default);
 
-    Task<CountInboxResult> CountInbox(
-        DateTime startDate,
-        DateTime endDate,
-        string lineNumber);
+    Task<AccountInfoDto> AccountInfo(
+        CancellationToken cancellationToken = default);
 
-    Task<CountInboxResult> CountInbox(
-        DateTime startDate,
-        DateTime endDate,
-        string lineNumber,
-        int isRead);
-
-    Task<List<CountPostalCodeResult>> CountPostalCode(
-        long postalcode);
-
-    Task<List<SendResult>> SendByPostalCode(
-        long postalcode,
-        string sender,
-        string message,
-        long mciStartIndex,
-        long mciCount,
-        long mtnStartIndex,
-        long mtnCount);
-
-    Task<List<SendResult>> SendByPostalCode(
-        long postalcode,
-        string sender,
-        string message,
-        long mciStartIndex,
-        long mciCount,
-        long mtnStartIndex,
-        long mtnCount,
-        DateTime date);
-
-    Task<AccountInfoResult> AccountInfo();
-
-    Task<AccountConfigResult> AccountConfig(
+    Task<AccountConfigDto> AccountConfig(
         string apiLogs,
         string dailyReport,
         string debugMode,
         string defaultSender,
         int? minCreditAlarm,
-        string resendFailed);
+        string resendFailed,
+        CancellationToken cancellationToken = default);
 
     Task<SendResult> VerifyLookup(
         string receptor,
-        string token,
-        string template);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
         string template,
-        VerifyLookupType type);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string template);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string template);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string template,
-        VerifyLookupType type);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string template,
-        VerifyLookupType type);
-
-    Task<SendResult> VerifyLookup(
-        string receptor,
-        string token,
-        string token2,
-        string token3,
-        string token10,
-        string token20,
-        string template,
-        VerifyLookupType type);
-
-    Task<SendResult> CallMakeTts(
-        string message,
-        string receptor);
-
-    Task<List<SendResult>> CallMakeTts(
-        string message,
-        List<string> receptor);
-
-    Task<List<SendResult>> CallMakeTts(
-        string message,
-        List<string> receptor,
-        DateTime? date,
-        List<string> localId);
+        string token1,
+        string? token2 = null,
+        string? token3 = null,
+        string? token4 = null,
+        string? token5 = null,
+        VerifyLookupType? type = null,
+        CancellationToken cancellationToken = default);
 }

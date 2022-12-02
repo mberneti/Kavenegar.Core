@@ -1,13 +1,13 @@
-﻿using Kavenegar.Core.Core;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Kavenegar.Core;
 
 public static class DependencyManager
 {
     public static IServiceCollection AddKavenegar(
-        this IServiceCollection serviceCollection)
+        this IServiceCollection serviceCollection,
+        string apiKey)
     {
-        return serviceCollection.AddAutoMapper(typeof(MappingProfiles).Assembly);
+        return serviceCollection.AddTransient<IKavenegarApi, KavenegarApi>(_ => new KavenegarApi(apiKey));
     }
 }
