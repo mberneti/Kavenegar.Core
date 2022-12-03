@@ -1,5 +1,4 @@
 using Kavenegar.Core.Enums;
-using Kavenegar.Core.Models.Enums;
 
 namespace Kavenegar.Core.Dto.Result;
 

@@ -1,8 +1,6 @@
 ﻿using Kavenegar.Core.Dto.Message;
 using Kavenegar.Core.Dto.Result;
 using Kavenegar.Core.Enums;
-using Kavenegar.Core.Models;
-using Kavenegar.Core.Models.Enums;
 
 namespace Kavenegar.Core;
 

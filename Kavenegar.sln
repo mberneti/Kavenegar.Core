@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{0E27FAE0-128A-4B33-86AC-EC949911C220}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{5A102430-241D-46A1-A615-0149411194D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Kavenegar.Core\Kavenegar.Core.csproj", "{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}"
@@ -22,6 +20,5 @@ Global
 		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5A102430-241D-46A1-A615-0149411194D5} = {0E27FAE0-128A-4B33-86AC-EC949911C220}
 	EndGlobalSection
 EndGlobal
