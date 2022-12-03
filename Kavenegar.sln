@@ -1,8 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{5A102430-241D-46A1-A615-0149411194D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Code\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{5A102430-241D-46A1-A615-0149411194D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Kavenegar.Core\Kavenegar.Core.csproj", "{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Code\Kavenegar.Core\Kavenegar.Core.csproj", "{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{67BC444E-84C9-493C-B776-55FE5D54D560}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{17B39BF3-CC26-40C5-AEB0-87CA2D71B93E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Test\Kavenegar.Core\Kavenegar.Core.csproj", "{6E36B3F6-2B1D-4506-BA92-007AC00EF317}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,7 +24,14 @@ Global
 		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB} = {67BC444E-84C9-493C-B776-55FE5D54D560}
+		{5A102430-241D-46A1-A615-0149411194D5} = {67BC444E-84C9-493C-B776-55FE5D54D560}
+		{6E36B3F6-2B1D-4506-BA92-007AC00EF317} = {17B39BF3-CC26-40C5-AEB0-87CA2D71B93E}
 	EndGlobalSection
 EndGlobal
