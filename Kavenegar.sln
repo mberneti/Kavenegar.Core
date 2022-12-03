@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{5A102430-241D-46A1-A615-0149411194D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Kavenegar.Core\Kavenegar.Core.csproj", "{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A102430-241D-46A1-A615-0149411194D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A102430-241D-46A1-A615-0149411194D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

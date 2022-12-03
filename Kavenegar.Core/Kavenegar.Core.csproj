@@ -1,33 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Version>1.0.5</Version>
-    
-    <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;</TargetFrameworks>
-    <Description>A cross-platform library for the kavenegar sms provider; written in C#</Description>
-    <RootNamespace>Kavenegar.Core</RootNamespace>
-    <AssemblyTitle>Kavenegar.Core</AssemblyTitle>
-    <AssemblyName>Kavenegar.Core</AssemblyName>
-    
-    <PackageId>KavenegarDotNetCore</PackageId>
-    <PackageTags>Kavenegar Core kavenegar.Core kavenegarCore Sms</PackageTags>
-    <PackageIconUrl></PackageIconUrl>
-    <PackageProjectUrl>https://github.com/kavenegar/Kavenegar.Core</PackageProjectUrl>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-    <OutputType>Library</OutputType>    
-    <RestorePackages>true</RestorePackages>
-    <BuildPackage>true</BuildPackage>
-    <Authors>HadiEskandari Ardavan HosseinRezaei Mberneti MohammadAmirriazi</Authors>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/kavenegar/Kavenegar.Core</RepositoryUrl>
-    <Company>Kavenegar</Company>
-    <PackageIcon></PackageIcon>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
+    </ItemGroup>
 
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shared\Shared.Infrastructure\Shared.Infrastructure.csproj"/>
+    </ItemGroup>
 
 </Project>
