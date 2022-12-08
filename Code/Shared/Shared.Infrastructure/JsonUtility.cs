@@ -5,7 +5,7 @@ namespace Shared.Infrastructure;
 
 public static class JsonUtility
 {
-    public static async Task<string> Serialize<T>(
+    public static async Task<string?> Serialize<T>(
         this T obj,
         CancellationToken cancellationToken = default)
     {

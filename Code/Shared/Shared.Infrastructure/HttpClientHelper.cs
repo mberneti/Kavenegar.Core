@@ -1,6 +1,6 @@
 ﻿namespace Shared.Infrastructure;
 
-public class HttpClientHelper
+public class HttpClientHelper : IHttpClientHelper
 {
     private readonly HttpClient _httpClient = new();
 

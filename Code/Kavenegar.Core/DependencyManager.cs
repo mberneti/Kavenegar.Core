@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Shared.Infrastructure;
 
 namespace Kavenegar.Core;
 
@@ -8,6 +9,14 @@ public static class DependencyManager
         this IServiceCollection serviceCollection,
         string apiKey)
     {
-        return serviceCollection.AddTransient<IKavenegarApi, KavenegarApi>(_ => new KavenegarApi(apiKey));
+        return serviceCollection.AddScoped<IHttpClientHelper, HttpClientHelper>()
+            .AddScoped<IKavenegarProfileApi, KavenegarProfileApi>(
+                serviceProvider => new KavenegarProfileApi(
+                    serviceProvider.GetRequiredService<IHttpClientHelper>(),
+                    apiKey))
+            .AddScoped<IKavenegarMessageSender, KavenegarMessageSender>(
+                serviceProvider => new KavenegarMessageSender(
+                    serviceProvider.GetRequiredService<IHttpClientHelper>(),
+                    apiKey));
     }
 }
