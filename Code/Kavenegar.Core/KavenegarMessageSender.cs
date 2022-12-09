@@ -35,28 +35,29 @@ public class KavenegarMessageSender
         string localMessageId = "",
         DateTime? dateTime = null,
         bool hide = false,
-        MessageType messageType = MessageType.AppMemory,
+        MessageType messageType = MessageType.Flash,
         CancellationToken cancellationToken = default)
     {
-        return (await Send(
-            new SendSingleMessageRequest
+        var sendSingleMessageRequest = new SendSingleMessageRequest
+        {
+            Hide = hide,
+            MessageInfo = new MessageInfo
             {
-                Date = dateTime ?? DateTime.Now,
-                Hide = hide,
-                MessageInfo = new MessageInfo
-                {
-                    Message = message,
-                    Sender = sender,
-                    Type = messageType
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        receptor, localMessageId
-                    }
-                }
+                Message = message,
+                Sender = sender,
+                Type = messageType
             },
-            cancellationToken))?.FirstOrDefault();
+            ReceptorLocalMessageIds = new Dictionary<string, string>
+            {
+                {
+                    receptor, localMessageId
+                }
+            }
+        };
+
+        if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
+
+        return (await Send(sendSingleMessageRequest, cancellationToken))?.FirstOrDefault();
     }
 
     /// <summary>
@@ -76,23 +77,24 @@ public class KavenegarMessageSender
         string sender = "",
         DateTime? dateTime = null,
         bool hide = false,
-        MessageType messageType = MessageType.AppMemory,
+        MessageType messageType = MessageType.Flash,
         CancellationToken cancellationToken = default)
     {
-        return await Send(
-            new SendSingleMessageRequest
+        var sendSingleMessageRequest = new SendSingleMessageRequest
+        {
+            Hide = hide,
+            MessageInfo = new MessageInfo
             {
-                Date = dateTime ?? DateTime.Now,
-                Hide = hide,
-                MessageInfo = new MessageInfo
-                {
-                    Message = message,
-                    Sender = sender,
-                    Type = messageType
-                },
-                ReceptorLocalMessageIds = receptors
+                Message = message,
+                Sender = sender,
+                Type = messageType
             },
-            cancellationToken);
+            ReceptorLocalMessageIds = receptors
+        };
+
+        if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
+
+        return await Send(sendSingleMessageRequest, cancellationToken);
     }
 
     public async Task<List<SendResultDto>?> Send(
@@ -101,9 +103,6 @@ public class KavenegarMessageSender
     {
         var queryParams = new Dictionary<string, object?>
         {
-            {
-                "sender", message.MessageInfo.Sender
-            },
             {
                 "receptor", string.Join(',', message.ReceptorLocalMessageIds.Keys)
             },
@@ -118,7 +117,9 @@ public class KavenegarMessageSender
             }
         };
 
-        if (message.ReceptorLocalMessageIds.Values.All(string.IsNullOrWhiteSpace))
+        if (message.MessageInfo.Sender.IsNotNullOrWhiteSpace()) queryParams.Add("sender", message.MessageInfo.Sender);
+
+        if (message.ReceptorLocalMessageIds.Values.All(i => i.IsNotNullOrWhiteSpace()))
             queryParams.Add("localId", string.Join(',', message.ReceptorLocalMessageIds.Values));
 
         return await RequestSender<List<SendResultDto>>(

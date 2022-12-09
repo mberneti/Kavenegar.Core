@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{67BC444E-8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{17B39BF3-CC26-40C5-AEB0-87CA2D71B93E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kavenegar.Core", "Test\Kavenegar.Core\Kavenegar.Core.csproj", "{6E36B3F6-2B1D-4506-BA92-007AC00EF317}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Kavenegar.Core", "Test\Test.Kavenegar.Core\Test.Kavenegar.Core.csproj", "{6E36B3F6-2B1D-4506-BA92-007AC00EF317}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

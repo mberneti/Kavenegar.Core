@@ -12,7 +12,7 @@ public class SendResultDto
     [JsonPropertyName("Status")]
     public int StatusNumber { get; set; }
 
-    public MessageStatus Status => StatusCaster(StatusNumber);
+    public MessageStatus MessageStatus => StatusCaster(StatusNumber);
     public string StatusText { get; set; } = null!;
     public string Sender { get; set; } = null!;
     public string Receptor { get; set; } = null!;

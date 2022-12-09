@@ -6,14 +6,14 @@ namespace Kavenegar.Core;
 public class BaseKavenegarApi
 {
     private const string ApiAddress = "https://api.kavenegar.com/v1";
-    protected readonly IHttpClientHelper HttpClientHelper;
+    private readonly IHttpClientHelper _httpClientHelper;
 
     protected BaseKavenegarApi(
         IHttpClientHelper httpClientHelper,
         string apiKey)
     {
-        HttpClientHelper = httpClientHelper;
-        HttpClientHelper.BaseAddress = Path.Combine(ApiAddress, apiKey);
+        _httpClientHelper = httpClientHelper;
+        _httpClientHelper.BaseAddress = Path.Combine(ApiAddress, apiKey);
     }
 
     protected async Task<T?> RequestSender<T>(
@@ -22,7 +22,7 @@ public class BaseKavenegarApi
         Dictionary<string, object?>? queryParams,
         CancellationToken cancellationToken)
     {
-        var httpResponseMessage = await HttpClientHelper.PostAsync(
+        var httpResponseMessage = await _httpClientHelper.PostAsync(
             requestUri,
             body,
             queryParams,

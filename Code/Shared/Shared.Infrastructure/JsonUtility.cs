@@ -20,20 +20,10 @@ public static class JsonUtility
     }
 
     public static async Task<T?> Deserialize<T>(
-        Stream json,
-        CancellationToken cancellationToken = default)
-    {
-        return await JsonSerializer.DeserializeAsync<T>(json, cancellationToken: cancellationToken);
-    }
-
-    public static async Task<T?> Deserialize<T>(
         this HttpResponseMessage httpResponseMessage,
         CancellationToken cancellationToken = default)
     {
         var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
-        var stream = new MemoryStream();
-        var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-        await streamWriter.WriteAsync(content);
-        return await Deserialize<T>(stream, cancellationToken);
+        return JsonSerializer.Deserialize<T>(content);
     }
 }

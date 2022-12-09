@@ -26,6 +26,6 @@ public class HttpClientHelper : IHttpClientHelper
         object obj,
         CancellationToken cancellationToken)
     {
-        return new StringContent(await obj.Serialize(cancellationToken));
+        return new StringContent(await obj.Serialize(cancellationToken) ?? "");
     }
 }
