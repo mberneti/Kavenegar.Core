@@ -4,7 +4,13 @@ namespace Kavenegar.Core.Dto.Message;
 
 public class MessageInfo
 {
-    public string Sender { get; set; } = null!;
-    public string Message { get; set; } = null!;
+    public MessageInfo(
+        string message)
+    {
+        Message = message;
+    }
+
+    public string? Sender { get; set; }
+    public string Message { get; set; }
     public MessageType Type { get; set; } = MessageType.Flash;
 }

@@ -2,7 +2,15 @@
 
 public class SendMessageInfo
 {
-    public MessageInfo MessageInfo { get; set; } = null!;
-    public string Receptor { get; set; } = null!;
+    public SendMessageInfo(
+        MessageInfo messageInfo,
+        string receptor)
+    {
+        MessageInfo = messageInfo;
+        Receptor = receptor;
+    }
+
+    public MessageInfo MessageInfo { get; set; }
+    public string Receptor { get; set; }
     public string LocalMessageId { get; set; } = null!;
 }

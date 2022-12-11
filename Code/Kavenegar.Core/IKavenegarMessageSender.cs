@@ -41,7 +41,7 @@ public interface IKavenegarMessageSender
     /// <returns></returns>
     Task<List<SendResultDto>?> Send(
         string message,
-        Dictionary<string, string> receptors,
+        Dictionary<string, string?> receptors,
         string sender = "",
         DateTime? dateTime = null,
         bool hide = false,
@@ -63,9 +63,9 @@ public interface IKavenegarMessageSender
         CancellationToken cancellationToken = default);
 
     Task<SendResultDto?> VerifyLookup(
-        string? receptor,
-        string? template,
-        string? token1,
+        string receptor,
+        string template,
+        string token1,
         string? token2 = null,
         string? token3 = null,
         string? token4 = null,

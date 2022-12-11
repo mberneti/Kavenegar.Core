@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Kavenegar.Core.Dto.Message;
 using Kavenegar.Core.Dto.Result;
 using Kavenegar.Core.Enums;
 using Moq;
@@ -12,10 +11,10 @@ using NUnit.Framework;
 using Shared.Infrastructure;
 using MessageSender = Kavenegar.Core.KavenegarMessageSender;
 
-namespace Test.Kavenegar.Core.KavenegarMessageSender;
+namespace Test.Kavenegar.Core.KavenegarMessageSender.SingleMessage;
 
 [TestFixture]
-public class SingleMessageSendToManyBaseMethodTests
+public class SendToOneTests
 {
     [SetUp]
     public void SetUp()
@@ -42,20 +41,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
         _mockHttpClientHelper.Verify(
             i => i.PostAsync(
@@ -90,20 +76,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(passedQueryParams.ContainsKey("sender"), Is.False);
     }
@@ -134,20 +107,9 @@ public class SingleMessageSendToManyBaseMethodTests
                 });
 
         await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message",
-                    Sender = "sender"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+            "message",
+            "receptor",
+            "sender");
 
         Assert.That(passedQueryParams["sender"], Is.EqualTo("sender"));
     }
@@ -177,20 +139,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(passedQueryParams.ContainsKey("localId"), Is.False);
     }
@@ -221,21 +170,11 @@ public class SingleMessageSendToManyBaseMethodTests
                 });
 
         await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", "localMessageId"
-                    }
-                }
-            });
+            "message",
+            "receptor",
+            localMessageId: "localMessageId");
 
-        Assert.That(passedQueryParams["localId"], Is.EqualTo("localMessageId"));
+        Assert.That(passedQueryParams.ContainsKey("localId"), Is.True);
     }
 
     [Test]
@@ -263,25 +202,9 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor1", ""
-                    },
-                    {
-                        "receptor2", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
-        Assert.That(passedQueryParams["receptor"], Is.EqualTo("receptor1,receptor2"));
+        Assert.That(passedQueryParams["receptor"], Is.EqualTo("receptor"));
         Assert.That(passedQueryParams["message"], Is.EqualTo("message"));
     }
 
@@ -310,26 +233,13 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(passedQueryParams["date"], Is.EqualTo(0));
     }
 
     [Test]
-    public async Task Send_SetDate_DateParamHasValue()
+    public async Task Send_SpecificDate_DateParamHasValue()
     {
         Dictionary<string, object?> passedQueryParams = null!;
         _mockHttpClientHelper.Setup(
@@ -354,22 +264,10 @@ public class SingleMessageSendToManyBaseMethodTests
                 });
 
         var dt = DateTime.Now;
-
         await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                },
-                Date = dt
-            });
+            "message",
+            "receptor",
+            dateTime: dt);
 
         Assert.That(passedQueryParams["date"], Is.EqualTo(dt.ToUnixTimestamp()));
     }
@@ -399,20 +297,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(passedQueryParams["type"], Is.EqualTo((int)MessageType.Flash));
     }
@@ -447,20 +332,9 @@ public class SingleMessageSendToManyBaseMethodTests
                 });
 
         await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message",
-                    Type = messageType
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+            "message",
+            "receptor",
+            messageType: messageType);
 
         Assert.That(passedQueryParams["type"], Is.EqualTo((int)messageType));
     }
@@ -480,20 +354,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{}", Encoding.UTF8)
                 });
 
-        var result = await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        var result = await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(result, Is.Null);
     }
@@ -513,20 +374,7 @@ public class SingleMessageSendToManyBaseMethodTests
                     Content = new StringContent("{\"entries\":[{}]}", Encoding.UTF8)
                 });
 
-        var result = await _kavenegarMessageSender.Send(
-            new SendSingleMessageRequest
-            {
-                MessageInfo = new MessageInfo
-                {
-                    Message = "message"
-                },
-                ReceptorLocalMessageIds = new Dictionary<string, string>
-                {
-                    {
-                        "receptor", ""
-                    }
-                }
-            });
+        var result = await _kavenegarMessageSender.Send("message", "receptor");
 
         Assert.That(result, Is.TypeOf<SendResultDto>());
     }

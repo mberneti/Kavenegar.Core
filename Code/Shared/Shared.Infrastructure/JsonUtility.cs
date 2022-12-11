@@ -1,22 +1,14 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Shared.Infrastructure;
 
 public static class JsonUtility
 {
-    public static async Task<string?> Serialize<T>(
+    public static string Serialize<T>(
         this T obj,
         CancellationToken cancellationToken = default)
     {
-        var stream = new MemoryStream();
-        await JsonSerializer.SerializeAsync(
-            stream,
-            obj,
-            cancellationToken: cancellationToken);
-
-        var streamReader = new StreamReader(stream, Encoding.UTF8);
-        return await streamReader.ReadToEndAsync();
+        return JsonSerializer.Serialize(obj, obj!.GetType());
     }
 
     public static async Task<T?> Deserialize<T>(

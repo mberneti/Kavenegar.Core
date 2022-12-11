@@ -18,14 +18,14 @@ public class HttpClientHelper : IHttpClientHelper
 
         return await _httpClient.PostAsync(
             address,
-            body == null ? null : await SerializeBody(body, cancellationToken),
+            body == null ? null : SerializeBody(body, cancellationToken),
             cancellationToken);
     }
 
-    private async Task<StringContent> SerializeBody(
+    private StringContent SerializeBody(
         object obj,
         CancellationToken cancellationToken)
     {
-        return new StringContent(await obj.Serialize(cancellationToken) ?? "");
+        return new StringContent(obj.Serialize(cancellationToken));
     }
 }

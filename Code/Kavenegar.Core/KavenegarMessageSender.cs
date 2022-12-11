@@ -38,21 +38,22 @@ public class KavenegarMessageSender
         MessageType messageType = MessageType.Flash,
         CancellationToken cancellationToken = default)
     {
-        var sendSingleMessageRequest = new SendSingleMessageRequest
+        var messageInfo = new MessageInfo(message)
         {
-            Hide = hide,
-            MessageInfo = new MessageInfo
+            Sender = sender,
+            Type = messageType
+        };
+
+        var receptorLocalMessageIds = new Dictionary<string, string?>
+        {
             {
-                Message = message,
-                Sender = sender,
-                Type = messageType
-            },
-            ReceptorLocalMessageIds = new Dictionary<string, string>
-            {
-                {
-                    receptor, localMessageId
-                }
+                receptor, localMessageId
             }
+        };
+
+        var sendSingleMessageRequest = new SendSingleMessageRequest(messageInfo, receptorLocalMessageIds)
+        {
+            Hide = hide
         };
 
         if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
@@ -73,23 +74,22 @@ public class KavenegarMessageSender
     /// <returns></returns>
     public async Task<List<SendResultDto>?> Send(
         string message,
-        Dictionary<string, string> receptors,
+        Dictionary<string, string?> receptors,
         string sender = "",
         DateTime? dateTime = null,
         bool hide = false,
         MessageType messageType = MessageType.Flash,
         CancellationToken cancellationToken = default)
     {
-        var sendSingleMessageRequest = new SendSingleMessageRequest
-        {
-            Hide = hide,
-            MessageInfo = new MessageInfo
+        var sendSingleMessageRequest = new SendSingleMessageRequest(
+            new MessageInfo(message)
             {
-                Message = message,
                 Sender = sender,
                 Type = messageType
             },
-            ReceptorLocalMessageIds = receptors
+            receptors)
+        {
+            Hide = hide
         };
 
         if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
@@ -136,11 +136,10 @@ public class KavenegarMessageSender
         CancellationToken cancellationToken = default)
     {
         return await Send(
-            new SendMultiMessageRequest
+            new SendMultiMessageRequest(sendMessageInfos)
             {
                 Date = dateTime ?? DateTime.Now,
-                Hide = hide,
-                SendMessageInfos = sendMessageInfos
+                Hide = hide
             },
             cancellationToken);
     }
@@ -153,26 +152,20 @@ public class KavenegarMessageSender
         {
             {
                 "message",
-                await messages.SendMessageInfos
+                messages.SendMessageInfos
                     .Select(sendMessageInfo => WebUtility.HtmlEncode(sendMessageInfo.MessageInfo.Message))
                     .ToList()
                     .Serialize(cancellationToken)
             },
             {
-                "sender",
-                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Sender)
-                    .ToList()
-                    .Serialize(cancellationToken)
-            },
-            {
                 "receptor",
-                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.Receptor)
+                messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.Receptor)
                     .ToList()
                     .Serialize(cancellationToken)
             },
             {
                 "type",
-                await messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Type.ToString())
+                messages.SendMessageInfos.Select(sendMessageInfo => (int)sendMessageInfo.MessageInfo.Type)
                     .Serialize(cancellationToken)
             },
             {
@@ -181,13 +174,18 @@ public class KavenegarMessageSender
         };
 
         if (messages.SendMessageInfos.All(
+                sendMessageInfo => sendMessageInfo.MessageInfo.Sender.IsNotNullOrWhiteSpace()))
+            requestParams.Add(
+                "sender",
+                messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Sender)
+                    .ToList()
+                    .Serialize(cancellationToken));
+
+        if (messages.SendMessageInfos.All(
                 sendMessageInfo => !string.IsNullOrWhiteSpace(sendMessageInfo.LocalMessageId)))
             requestParams.Add(
                 "localMessageIds",
-                string.Join(
-                    ",",
-                    messages.SendMessageInfos.Select(
-                        sendMessageInfo => !string.IsNullOrWhiteSpace(sendMessageInfo.LocalMessageId))));
+                string.Join(",", messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.LocalMessageId)));
 
         return await RequestSender<List<SendResultDto>>(
             "sms/sendarray.json",
@@ -197,9 +195,9 @@ public class KavenegarMessageSender
     }
 
     public async Task<SendResultDto?> VerifyLookup(
-        string? receptor,
-        string? template,
-        string? token1,
+        string receptor,
+        string template,
+        string token1,
         string? token2 = null,
         string? token3 = null,
         string? token4 = null,
@@ -207,24 +205,44 @@ public class KavenegarMessageSender
         VerifyLookupType? type = null,
         CancellationToken cancellationToken = default)
     {
+        return await VerifyLookup(
+            new VerifyLookupRequest(
+                receptor,
+                template,
+                token1)
+            {
+                Token2 = token2,
+                Token3 = token3,
+                Token4 = token4,
+                Token5 = token5,
+                VerifyLookupType = type
+            },
+            cancellationToken);
+    }
+
+    public async Task<SendResultDto?> VerifyLookup(
+        VerifyLookupRequest verifyLookupRequest,
+        CancellationToken cancellationToken = default)
+    {
         var queryParams = new Dictionary<string, object?>
         {
             {
-                "receptor", receptor
+                "receptor", verifyLookupRequest.Receptor
             },
             {
-                "template", template
+                "template", verifyLookupRequest.Template
             },
             {
-                "token", token1
+                "token", verifyLookupRequest.Token1
             }
         };
 
-        if (string.IsNullOrWhiteSpace(token2)) queryParams.Add("token2", token2);
-        if (string.IsNullOrWhiteSpace(token3)) queryParams.Add("token3", token3);
-        if (string.IsNullOrWhiteSpace(token4)) queryParams.Add("token10", token4);
-        if (string.IsNullOrWhiteSpace(token5)) queryParams.Add("token20", token5);
-        if (type.HasValue) queryParams.Add("type", type.Value.ToString());
+        if (verifyLookupRequest.Token2.IsNotNullOrWhiteSpace()) queryParams.Add("token2", verifyLookupRequest.Token2);
+        if (verifyLookupRequest.Token3.IsNotNullOrWhiteSpace()) queryParams.Add("token3", verifyLookupRequest.Token3);
+        if (verifyLookupRequest.Token4.IsNotNullOrWhiteSpace()) queryParams.Add("token10", verifyLookupRequest.Token4);
+        if (verifyLookupRequest.Token5.IsNotNullOrWhiteSpace()) queryParams.Add("token20", verifyLookupRequest.Token5);
+        if (verifyLookupRequest.VerifyLookupType.HasValue)
+            queryParams.Add("type", (int)verifyLookupRequest.VerifyLookupType.Value);
 
         return (await RequestSender<List<SendResultDto>>(
             "verify/lookup.json",
