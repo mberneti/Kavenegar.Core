@@ -1,4 +1,5 @@
 ﻿using Kavenegar.Core.Dto.Result;
+using Kavenegar.Core.Enums;
 using Shared.Infrastructure;
 
 namespace Kavenegar.Core;
@@ -26,7 +27,7 @@ public class KavenegarProfileApi
     }
 
     public async Task<List<StatusMessageDto>?> Status(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default)
     {
         var queryParams = new Dictionary<string, object?>
@@ -56,7 +57,7 @@ public class KavenegarProfileApi
     }
 
     public async Task<List<LocalStatusDto>?> StatusLocalMessageId(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default)
     {
         var queryParams = new Dictionary<string, object?>
@@ -86,7 +87,7 @@ public class KavenegarProfileApi
     }
 
     public async Task<List<SendResultDto>?> Select(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default)
     {
         var queryParams = new Dictionary<string, object?>
@@ -105,18 +106,12 @@ public class KavenegarProfileApi
 
     public async Task<List<SendResultDto>?> SelectOutbox(
         DateTime startDate,
-        DateTime? endDate,
-        string? sender,
+        DateTime? endDate = null,
+        string? sender = null,
         CancellationToken cancellationToken = default)
     {
-        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
-
-        if ((endDate - startDate)!.Value.TotalDays > 1)
-            throw new ArgumentException(
-                "حداکثر فاصله زمانی بین متغیر startDate تا متغیر endDate برابر با 1 روز می باشد.");
-
-        if (startDate < DateTime.Now.AddDays(-60))
-            throw new ArgumentException("تاریخ شروع startDate حداکثر باید تا 60 روز قبل باشد.");
+        var error = ValidateDatePeriod(startDate, endDate);
+        if (error.IsNotNullOrWhiteSpace()) throw new ArgumentException(error);
 
         var queryParams = new Dictionary<string, object?>
         {
@@ -126,7 +121,7 @@ public class KavenegarProfileApi
         };
 
         if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
-        if (string.IsNullOrWhiteSpace(sender)) queryParams.Add("sender", sender);
+        if (sender.IsNotNullOrWhiteSpace()) queryParams.Add("sender", sender);
 
         return await RequestSender<List<SendResultDto>>(
             "sms/selectoutbox.json",
@@ -136,8 +131,8 @@ public class KavenegarProfileApi
     }
 
     public async Task<List<SendResultDto>?> LatestOutbox(
-        long? pageSize,
-        string? sender,
+        int? pageSize = null,
+        string? sender = null,
         CancellationToken cancellationToken = default)
     {
         if (pageSize is > 500) throw new ArgumentException("تعداد رکورد های خروجی این متد حداکثر 500 رکورد می‌باشد.");
@@ -151,7 +146,7 @@ public class KavenegarProfileApi
             }
         };
 
-        if (string.IsNullOrWhiteSpace(sender)) queryParams.Add("sender", sender);
+        if (sender.IsNotNullOrWhiteSpace()) queryParams.Add("sender", sender);
 
         return await RequestSender<List<SendResultDto>>(
             "sms/latestoutbox.json",
@@ -162,18 +157,12 @@ public class KavenegarProfileApi
 
     public async Task<CountOutboxDto?> CountOutbox(
         DateTime startDate,
-        DateTime? endDate,
-        int? status,
+        DateTime? endDate = null,
+        MessageStatus? status = null,
         CancellationToken cancellationToken = default)
     {
-        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
-
-        if ((endDate - startDate)!.Value.TotalDays > 1)
-            throw new ArgumentException(
-                "حداکثر فاصله زمانی بین متغیر startdate تا متغیر endDate برابر با 1 روز می باشد.");
-
-        if (startDate < DateTime.Now.AddDays(-60))
-            throw new ArgumentException("تاریخ شروع startdate حداکثر باید تا 60 روز قبل باشد.");
+        var error = ValidateDatePeriod(startDate, endDate);
+        if (error.IsNotNullOrWhiteSpace()) throw new ArgumentException(error);
 
         var queryParams = new Dictionary<string, object?>
         {
@@ -183,7 +172,7 @@ public class KavenegarProfileApi
         };
 
         if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
-        if (status.HasValue) queryParams.Add("status", status);
+        if (status.HasValue) queryParams.Add("status", (int)status);
 
         return (await RequestSender<List<CountOutboxDto>>(
             "sms/countoutbox.json",
@@ -205,7 +194,7 @@ public class KavenegarProfileApi
     }
 
     public async Task<List<StatusMessageDto>?> Cancel(
-        List<string> ids,
+        IEnumerable<string> ids,
         CancellationToken cancellationToken = default)
     {
         var queryParams = new Dictionary<string, object?>
@@ -245,19 +234,13 @@ public class KavenegarProfileApi
 
     public async Task<CountInboxDto?> CountInbox(
         DateTime startDate,
-        DateTime? endDate,
-        string? lineNumber,
-        bool? isRead,
+        DateTime? endDate = null,
+        string? lineNumber = null,
+        bool? isRead = null,
         CancellationToken cancellationToken = default)
     {
-        if (endDate <= startDate) throw new ArgumentException("تاریخ پایان باید از تاریخ شروع بزرگتر باشد.");
-
-        if ((endDate - startDate)!.Value.TotalDays > 1)
-            throw new ArgumentException(
-                "حداکثر فاصله زمانی بین متغیر startdate تا متغیر endDate برابر با 1 روز می باشد.");
-
-        if (startDate < DateTime.Now.AddDays(-60))
-            throw new ArgumentException("تاریخ شروع startdate حداکثر باید تا 60 روز قبل باشد.");
+        var error = ValidateDatePeriod(startDate, endDate);
+        if (error.IsNotNullOrWhiteSpace()) throw new ArgumentException(error);
 
         var queryParams = new Dictionary<string, object?>
         {
@@ -267,7 +250,7 @@ public class KavenegarProfileApi
         };
 
         if (endDate.HasValue) queryParams.Add("enddate", endDate.Value.ToUnixTimestamp());
-        if (string.IsNullOrWhiteSpace(lineNumber)) queryParams.Add("linenumber", lineNumber);
+        if (lineNumber.IsNotNullOrWhiteSpace()) queryParams.Add("linenumber", lineNumber);
         if (isRead.HasValue) queryParams.Add("isread", isRead.Value ? 1 : 0);
 
         return (await RequestSender<List<CountInboxDto>>(
@@ -288,27 +271,50 @@ public class KavenegarProfileApi
     }
 
     public async Task<AccountConfigDto?> AccountConfig(
-        string? apiLogs,
-        string? dailyReport,
-        string? debugMode,
-        string? defaultSender,
-        int? minCreditAlarm,
-        string? resendFailed,
+        string? apiLogs = null,
+        string? dailyReport = null,
+        string? debugMode = null,
+        string? defaultSender = null,
+        int? minCreditAlarm = null,
+        string? resendFailed = null,
         CancellationToken cancellationToken = default)
     {
+        if (apiLogs.IsNullOrWhiteSpace() &&
+            dailyReport.IsNullOrWhiteSpace() &&
+            debugMode.IsNullOrWhiteSpace() &&
+            defaultSender.IsNullOrWhiteSpace() &&
+            !minCreditAlarm.HasValue &&
+            resendFailed.IsNullOrWhiteSpace())
+            throw new ArgumentException("حداقل یکی از مقادیر باید وارد شده باشند.");
+
         var queryParams = new Dictionary<string, object?>();
 
-        if (string.IsNullOrWhiteSpace(apiLogs)) queryParams.Add("apilogs", apiLogs);
-        if (string.IsNullOrWhiteSpace(dailyReport)) queryParams.Add("dailyreport", dailyReport);
-        if (string.IsNullOrWhiteSpace(debugMode)) queryParams.Add("debugmode", debugMode);
-        if (string.IsNullOrWhiteSpace(defaultSender)) queryParams.Add("defaultsender", defaultSender);
-        queryParams.Add("mincreditalarm", minCreditAlarm);
-        if (string.IsNullOrWhiteSpace(resendFailed)) queryParams.Add("resendfailed", resendFailed);
+        if (apiLogs.IsNotNullOrWhiteSpace()) queryParams.Add("apilogs", apiLogs);
+        if (dailyReport.IsNotNullOrWhiteSpace()) queryParams.Add("dailyreport", dailyReport);
+        if (debugMode.IsNotNullOrWhiteSpace()) queryParams.Add("debugmode", debugMode);
+        if (defaultSender.IsNotNullOrWhiteSpace()) queryParams.Add("defaultsender", defaultSender);
+        if (minCreditAlarm.HasValue) queryParams.Add("mincreditalarm", minCreditAlarm);
+        if (resendFailed.IsNotNullOrWhiteSpace()) queryParams.Add("resendfailed", resendFailed);
 
         return await RequestSender<AccountConfigDto>(
             "account/config.json",
             null,
             queryParams,
             cancellationToken);
+    }
+
+    private string ValidateDatePeriod(
+        DateTime startDate,
+        DateTime? endDate = null)
+    {
+        if (startDate < DateTime.Now.AddDays(-60)) return "تاریخ شروع startDate حداکثر باید تا 60 روز قبل باشد.";
+
+        if (endDate <= startDate) return "تاریخ پایان باید از تاریخ شروع بزرگتر باشد.";
+
+        if (endDate.HasValue &&
+            (endDate - startDate).Value.TotalDays > 1)
+            return "حداکثر فاصله زمانی بین متغیر startDate تا متغیر endDate برابر با 1 روز می باشد.";
+
+        return string.Empty;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Kavenegar.Core.Dto.Result;
+using Kavenegar.Core.Enums;
 
 namespace Kavenegar.Core;
 
@@ -9,7 +10,7 @@ public interface IKavenegarProfileApi
         CancellationToken cancellationToken = default);
 
     Task<List<StatusMessageDto>?> Status(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default);
 
     Task<LocalStatusDto?> StatusLocalMessageId(
@@ -17,7 +18,7 @@ public interface IKavenegarProfileApi
         CancellationToken cancellationToken = default);
 
     Task<List<LocalStatusDto>?> StatusLocalMessageId(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default);
 
     Task<SendResultDto?> Select(
@@ -25,24 +26,24 @@ public interface IKavenegarProfileApi
         CancellationToken cancellationToken = default);
 
     Task<List<SendResultDto>?> Select(
-        List<string> messageIds,
+        IEnumerable<string> messageIds,
         CancellationToken cancellationToken = default);
 
     Task<List<SendResultDto>?> SelectOutbox(
         DateTime startDate,
-        DateTime? endDate,
-        string? sender,
+        DateTime? endDate = null,
+        string? sender = null,
         CancellationToken cancellationToken = default);
 
     Task<List<SendResultDto>?> LatestOutbox(
-        long? pageSize,
-        string? sender,
+        int? pageSize = null,
+        string? sender = null,
         CancellationToken cancellationToken = default);
 
     Task<CountOutboxDto?> CountOutbox(
         DateTime startDate,
-        DateTime? endDate,
-        int? status,
+        DateTime? endDate = null,
+        MessageStatus? status = null,
         CancellationToken cancellationToken = default);
 
     Task<StatusMessageDto?> Cancel(
@@ -50,7 +51,7 @@ public interface IKavenegarProfileApi
         CancellationToken cancellationToken = default);
 
     Task<List<StatusMessageDto>?> Cancel(
-        List<string> ids,
+        IEnumerable<string> ids,
         CancellationToken cancellationToken = default);
 
     Task<List<ReceivedMessageDto>?> Receive(
@@ -69,11 +70,11 @@ public interface IKavenegarProfileApi
         CancellationToken cancellationToken = default);
 
     Task<AccountConfigDto?> AccountConfig(
-        string apiLogs,
-        string dailyReport,
-        string debugMode,
-        string defaultSender,
-        int? minCreditAlarm,
-        string resendFailed,
+        string? apiLogs = null,
+        string? dailyReport = null,
+        string? debugMode = null,
+        string? defaultSender = null,
+        int? minCreditAlarm = null,
+        string? resendFailed = null,
         CancellationToken cancellationToken = default);
 }

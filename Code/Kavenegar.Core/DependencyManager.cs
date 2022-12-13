@@ -9,14 +9,19 @@ public static class DependencyManager
         this IServiceCollection serviceCollection,
         string apiKey)
     {
-        return serviceCollection.AddScoped<IHttpClientHelper, HttpClientHelper>()
-            .AddScoped<IKavenegarProfileApi, KavenegarProfileApi>(
-                serviceProvider => new KavenegarProfileApi(
-                    serviceProvider.GetRequiredService<IHttpClientHelper>(),
-                    apiKey))
-            .AddScoped<IKavenegarMessageSender, KavenegarMessageSender>(
-                serviceProvider => new KavenegarMessageSender(
-                    serviceProvider.GetRequiredService<IHttpClientHelper>(),
-                    apiKey));
+        serviceCollection.AddScoped<HttpClient>();
+        serviceCollection.AddScoped<IHttpClientHelper, HttpClientHelper>();
+
+        serviceCollection.AddScoped<IKavenegarProfileApi, KavenegarProfileApi>(
+            serviceProvider => new KavenegarProfileApi(
+                serviceProvider.GetRequiredService<IHttpClientHelper>(),
+                apiKey));
+
+        serviceCollection.AddScoped<IKavenegarMessageSender, KavenegarMessageSender>(
+            serviceProvider => new KavenegarMessageSender(
+                serviceProvider.GetRequiredService<IHttpClientHelper>(),
+                apiKey));
+
+        return serviceCollection;
     }
 }

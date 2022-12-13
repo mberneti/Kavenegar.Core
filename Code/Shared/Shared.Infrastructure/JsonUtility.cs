@@ -5,8 +5,7 @@ namespace Shared.Infrastructure;
 public static class JsonUtility
 {
     public static string Serialize<T>(
-        this T obj,
-        CancellationToken cancellationToken = default)
+        this T obj)
     {
         return JsonSerializer.Serialize(obj, obj!.GetType());
     }

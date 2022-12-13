@@ -155,18 +155,15 @@ public class KavenegarMessageSender
                 messages.SendMessageInfos
                     .Select(sendMessageInfo => WebUtility.HtmlEncode(sendMessageInfo.MessageInfo.Message))
                     .ToList()
-                    .Serialize(cancellationToken)
+                    .Serialize()
             },
             {
                 "receptor",
-                messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.Receptor)
-                    .ToList()
-                    .Serialize(cancellationToken)
+                messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.Receptor).ToList().Serialize()
             },
             {
                 "type",
-                messages.SendMessageInfos.Select(sendMessageInfo => (int)sendMessageInfo.MessageInfo.Type)
-                    .Serialize(cancellationToken)
+                messages.SendMessageInfos.Select(sendMessageInfo => (int)sendMessageInfo.MessageInfo.Type).Serialize()
             },
             {
                 "date", messages.Date == DateTime.MinValue ? 0 : messages.Date.ToUnixTimestamp()
@@ -179,7 +176,7 @@ public class KavenegarMessageSender
                 "sender",
                 messages.SendMessageInfos.Select(sendMessageInfo => sendMessageInfo.MessageInfo.Sender)
                     .ToList()
-                    .Serialize(cancellationToken));
+                    .Serialize());
 
         if (messages.SendMessageInfos.All(
                 sendMessageInfo => !string.IsNullOrWhiteSpace(sendMessageInfo.LocalMessageId)))

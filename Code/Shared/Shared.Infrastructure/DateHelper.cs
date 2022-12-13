@@ -18,12 +18,6 @@ public static class DateHelper
         return MinUnixDateTime.AddSeconds(unixTimeStamp);
     }
 
-    public static DateTime ToDateTime(
-        this double unixTimeStamp)
-    {
-        return MinUnixDateTime.AddSeconds(unixTimeStamp);
-    }
-
     public static double ToUnixTimestamp(
         this DateTime dt)
     {

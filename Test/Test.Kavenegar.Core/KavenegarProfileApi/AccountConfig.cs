@@ -2,66 +2,60 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Kavenegar.Core.Dto.Message;
 using Kavenegar.Core.Dto.Result;
-using Kavenegar.Core.Enums;
 using Moq;
 using NUnit.Framework;
 using Shared.Infrastructure;
-using MessageSender = Kavenegar.Core.KavenegarMessageSender;
+using Profile = Kavenegar.Core.KavenegarProfileApi;
 
-namespace Test.Kavenegar.Core.KavenegarMessageSender.VerifyLookup;
+namespace Test.Kavenegar.Core.KavenegarProfileApi;
 
-[TestFixture]
-public class VerifyLookupWithDto
+public class AccountConfig
 {
+    private Profile _kavenegarProfileApi = null!;
+    private Mock<IHttpClientHelper> _mockHttpClientHelper = null!;
+
     [SetUp]
     public void SetUp()
     {
         _mockHttpClientHelper = new Mock<IHttpClientHelper>();
-        _kavenegarMessageSender = new MessageSender(_mockHttpClientHelper.Object, "");
+        _kavenegarProfileApi = new Profile(_mockHttpClientHelper.Object, "");
     }
 
-    private MessageSender _kavenegarMessageSender = null!;
-    private Mock<IHttpClientHelper> _mockHttpClientHelper = null!;
-
     [Test]
-    public async Task VerifyLookup_WhenCalled_CallsPostAsync()
+    public async Task AccountConfig_WithAtLeastOneArgumentPassed_ReturnsAccountConfigDto()
     {
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new HttpResponseMessage
                 {
-                    Content = new StringContent("{}")
+                    Content = new StringContent("{\"entries\":{}}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        var result = await _kavenegarProfileApi.AccountConfig(dailyReport: "a");
 
-        _mockHttpClientHelper.Verify(
-            i => i.PostAsync(
-                "verify/lookup.json",
-                null,
-                It.IsAny<Dictionary<string, object?>>(),
-                It.IsAny<CancellationToken>()));
+        Assert.That(result, Is.TypeOf<AccountConfigDto>());
     }
 
     [Test]
-    public async Task VerifyLookup_WhenCalled_CheckReceptorQueryParam()
+    public void AccountConfig_NoSettingArgumentIsSet_ThrowsArgumentException()
+    {
+        Assert.That(async () => await _kavenegarProfileApi.AccountConfig(), Throws.ArgumentException);
+    }
+
+    [Test]
+    public async Task AccountConfig_WithNoApiLogs_QueryParamsNotIncludeApiLogs()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -80,23 +74,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "receptor",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(dailyReport: "a");
 
-        Assert.That(passedQueryParams["receptor"], Is.EqualTo("receptor"));
+        Assert.That(passedQueryParams.ContainsKey("apilogs"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WhenCalled_CheckTemplateQueryParam()
+    public async Task AccountConfig_WithApiLogs_QueryParamsIncludeApiLogs()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -115,23 +105,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "template",
-                ""));
+        await _kavenegarProfileApi.AccountConfig("apilogs");
 
-        Assert.That(passedQueryParams["template"], Is.EqualTo("template"));
+        Assert.That(passedQueryParams["apilogs"], Is.EqualTo("apilogs"));
     }
 
     [Test]
-    public async Task VerifyLookup_WhenCalled_CheckFirstTokenQueryParam()
+    public async Task AccountConfig_WithNoDailyReport_QueryParamsNotIncludeDailyReport()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -150,23 +136,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "token"));
+        await _kavenegarProfileApi.AccountConfig("a");
 
-        Assert.That(passedQueryParams["token"], Is.EqualTo("token"));
+        Assert.That(passedQueryParams.ContainsKey("dailyreport"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WithNoToken2_QueryParamsNotIncludeToken2()
+    public async Task AccountConfig_WithDailyReport_QueryParamsIncludeDailyReport()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -185,23 +167,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(dailyReport: "dailyreport");
 
-        Assert.That(passedQueryParams.ContainsKey("token2"), Is.False);
+        Assert.That(passedQueryParams["dailyreport"], Is.EqualTo("dailyreport"));
     }
 
     [Test]
-    public async Task VerifyLookup_WithToken2_QueryParamsIncludeToken2()
+    public async Task AccountConfig_WithNoDebugMode_QueryParamsNotIncludeDebugMode()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -220,26 +198,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "")
-            {
-                Token2 = "token2"
-            });
+        await _kavenegarProfileApi.AccountConfig("a");
 
-        Assert.That(passedQueryParams["token2"], Is.EqualTo("token2"));
+        Assert.That(passedQueryParams.ContainsKey("debugmode"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WithNoToken3_QueryParamsNotIncludeToken3()
+    public async Task AccountConfig_WithDebugMode_QueryParamsIncludeDebugMode()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -258,23 +229,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(debugMode: "debugmode");
 
-        Assert.That(passedQueryParams.ContainsKey("token3"), Is.False);
+        Assert.That(passedQueryParams["debugmode"], Is.EqualTo("debugmode"));
     }
 
     [Test]
-    public async Task VerifyLookup_WithToken3_QueryParamsIncludeToken3()
+    public async Task AccountConfig_WithNoDefaultSender_QueryParamsNotIncludeDefaultSender()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -293,26 +260,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "")
-            {
-                Token3 = "token3"
-            });
+        await _kavenegarProfileApi.AccountConfig("a");
 
-        Assert.That(passedQueryParams["token3"], Is.EqualTo("token3"));
+        Assert.That(passedQueryParams.ContainsKey("defaultsender"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WithNoToken4_QueryParamsNotIncludeToken10()
+    public async Task AccountConfig_WithDefaultSender_QueryParamsIncludeDefaultSender()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -331,23 +291,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(defaultSender: "defaultsender");
 
-        Assert.That(passedQueryParams.ContainsKey("token10"), Is.False);
+        Assert.That(passedQueryParams["defaultsender"], Is.EqualTo("defaultsender"));
     }
 
     [Test]
-    public async Task VerifyLookup_WithToken4_QueryParamsIncludeToken10()
+    public async Task AccountConfig_WithNoMinCreditAlarm_QueryParamsNotIncludeMinCreditAlarm()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -366,26 +322,23 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "")
-            {
-                Token4 = "token10"
-            });
+        await _kavenegarProfileApi.AccountConfig("a");
 
-        Assert.That(passedQueryParams["token10"], Is.EqualTo("token10"));
+        Assert.That(passedQueryParams.ContainsKey("mincreditalarm"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WithNoToken5_QueryParamsNotIncludeToken20()
+    [TestCase(1)]
+    [TestCase(10)]
+    [TestCase(100)]
+    public async Task AccountConfig_WithMinCreditAlarm_QueryParamsIncludeMinCreditAlarm(
+        int mincreditalarm)
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -404,23 +357,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(minCreditAlarm: mincreditalarm);
 
-        Assert.That(passedQueryParams.ContainsKey("token20"), Is.False);
+        Assert.That(passedQueryParams["mincreditalarm"], Is.EqualTo(mincreditalarm));
     }
 
     [Test]
-    public async Task VerifyLookup_WithToken5_QueryParamsIncludeToken20()
+    public async Task AccountConfig_WithNoResendFailed_QueryParamsNotIncludeResendFailed()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -439,26 +388,19 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "")
-            {
-                Token5 = "token20"
-            });
+        await _kavenegarProfileApi.AccountConfig("a");
 
-        Assert.That(passedQueryParams["token20"], Is.EqualTo("token20"));
+        Assert.That(passedQueryParams.ContainsKey("resendfailed"), Is.False);
     }
 
     [Test]
-    public async Task VerifyLookup_WithNoType_QueryParamsNotIncludeType()
+    public async Task AccountConfig_WithResendFailed_QueryParamsIncludeResendFailed()
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
         _mockHttpClientHelper.Setup(
                 i => i.PostAsync(
-                    "verify/lookup.json",
+                    "account/config.json",
                     null,
                     It.IsAny<Dictionary<string, object?>>(),
                     It.IsAny<CancellationToken>()))
@@ -477,74 +419,8 @@ public class VerifyLookupWithDto
                     Content = new StringContent("{}")
                 });
 
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
+        await _kavenegarProfileApi.AccountConfig(resendFailed: "resendfailed");
 
-        Assert.That(passedQueryParams.ContainsKey("type"), Is.False);
-    }
-
-    [Test]
-    public async Task VerifyLookup_WithType_QueryParamsIncludeType()
-    {
-        Dictionary<string, object?> passedQueryParams = null!;
-
-        _mockHttpClientHelper.Setup(
-                i => i.PostAsync(
-                    "verify/lookup.json",
-                    null,
-                    It.IsAny<Dictionary<string, object?>>(),
-                    It.IsAny<CancellationToken>()))
-            .Callback<string, object?, Dictionary<string, object?>, CancellationToken>(
-                (
-                    _,
-                    _,
-                    queryParams,
-                    _) =>
-                {
-                    passedQueryParams = queryParams;
-                })
-            .ReturnsAsync(
-                new HttpResponseMessage
-                {
-                    Content = new StringContent("{}")
-                });
-
-        await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                "")
-            {
-                VerifyLookupType = VerifyLookupType.Call
-            });
-
-        Assert.That(passedQueryParams["type"], Is.EqualTo((int)VerifyLookupType.Call));
-    }
-
-    [Test]
-    public async Task VerifyLookup_WhenCalled_ReturnsSendResult()
-    {
-        _mockHttpClientHelper.Setup(
-                i => i.PostAsync(
-                    "verify/lookup.json",
-                    null,
-                    It.IsAny<Dictionary<string, object?>>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(
-                new HttpResponseMessage
-                {
-                    Content = new StringContent("{\"entries\":[{}]}")
-                });
-
-        var result = await _kavenegarMessageSender.VerifyLookup(
-            new VerifyLookupRequest(
-                "",
-                "",
-                ""));
-
-        Assert.That(result, Is.TypeOf<SendResultDto>());
+        Assert.That(passedQueryParams["resendfailed"], Is.EqualTo("resendfailed"));
     }
 }

@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{17B39BF3-C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Kavenegar.Core", "Test\Test.Kavenegar.Core\Test.Kavenegar.Core.csproj", "{6E36B3F6-2B1D-4506-BA92-007AC00EF317}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Shared.Infrastructure", "Test\Test.Shared.Infrastructure\Test.Shared.Infrastructure.csproj", "{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,10 +30,15 @@ Global
 		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E36B3F6-2B1D-4506-BA92-007AC00EF317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{35D0DBF6-25F0-4DEB-9BC8-D3C3B65933EB} = {67BC444E-84C9-493C-B776-55FE5D54D560}
 		{5A102430-241D-46A1-A615-0149411194D5} = {67BC444E-84C9-493C-B776-55FE5D54D560}
 		{6E36B3F6-2B1D-4506-BA92-007AC00EF317} = {17B39BF3-CC26-40C5-AEB0-87CA2D71B93E}
+		{F7A2FE83-BE4B-4A9D-BEF5-A14FC8E05AFD} = {17B39BF3-CC26-40C5-AEB0-87CA2D71B93E}
 	EndGlobalSection
 EndGlobal

@@ -2,9 +2,15 @@
 
 public class HttpClientHelper : IHttpClientHelper
 {
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient;
 
-    public string BaseAddress { get; set; } = null!;
+    public HttpClientHelper(
+        HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public string BaseAddress { get; set; } = "";
 
     public async Task<HttpResponseMessage> PostAsync(
         string requestUri,
@@ -13,19 +19,12 @@ public class HttpClientHelper : IHttpClientHelper
         CancellationToken cancellationToken = default)
     {
         var address = queryParams == null ?
-            Path.Combine(BaseAddress, requestUri) :
-            QueryParamHelper.AddQueryParamToUri(Path.Combine(BaseAddress, requestUri), queryParams);
+            $"{BaseAddress}/{requestUri}" :
+            QueryParamHelper.AddQueryParamToUri($"{BaseAddress}/{requestUri}", queryParams);
 
         return await _httpClient.PostAsync(
             address,
-            body == null ? null : SerializeBody(body, cancellationToken),
+            body == null ? null : new StringContent(body.Serialize()),
             cancellationToken);
-    }
-
-    private StringContent SerializeBody(
-        object obj,
-        CancellationToken cancellationToken)
-    {
-        return new StringContent(obj.Serialize(cancellationToken));
     }
 }

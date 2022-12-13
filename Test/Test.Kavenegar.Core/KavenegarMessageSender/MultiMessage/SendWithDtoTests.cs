@@ -188,7 +188,8 @@ public class SendWithDtoTests
     [Test]
     [TestCase("1")]
     [TestCase("2")]
-    public async Task Send_WhenCalled_CheckReceptorQueryParam(string receptor)
+    public async Task Send_WhenCalled_CheckReceptorQueryParam(
+        string receptor)
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
@@ -233,7 +234,8 @@ public class SendWithDtoTests
     [Test]
     [TestCase(MessageType.Flash)]
     [TestCase(MessageType.AppMemory)]
-    public async Task Send_WhenCalled_CheckTypeQueryParam(MessageType messageType)
+    public async Task Send_WhenCalled_CheckTypeQueryParam(
+        MessageType messageType)
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
@@ -332,7 +334,8 @@ public class SendWithDtoTests
     [Test]
     [TestCase("1")]
     [TestCase("2")]
-    public async Task Send_WithLocalMessageId_QueryParamsIncludeLocalMessageId(string localMessageId)
+    public async Task Send_WithLocalMessageId_QueryParamsIncludeLocalMessageId(
+        string localMessageId)
     {
         Dictionary<string, object?> passedQueryParams = null!;
 
