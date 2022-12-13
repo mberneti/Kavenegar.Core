@@ -21,11 +21,13 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=statuslocalmessageid/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0022_062A_0639_062F_0627/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0628_0627_0634_062F/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0628_0627_0634_0646_062F/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0628_0627_06CC_062F/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0628_0631_0627_0628_0631/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0628_0632_0631_06AF_062A_0631/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_062A_0627_0631_06CC_062E/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_062A_0639_062F_0627_062F/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=_062D_062F_0627_0642_0644/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_062D_062F_0627_06A9_062B_0631/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_062E_0631_0648_062C_06CC/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0631_06A9_0648_0631_062F/@EntryIndexedValue">True</s:Boolean>
@@ -33,4 +35,6 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0634_0631_0648_0639/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0641_0627_0635_0644_0647/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0645_062A_063A_06CC_0631/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0645_0642_0627_062F_06CC_0631/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=_0648_0627_0631_062F/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_067E_0627_06CC_0627_0646/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
