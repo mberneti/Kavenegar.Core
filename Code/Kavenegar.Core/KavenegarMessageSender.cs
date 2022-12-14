@@ -16,6 +16,11 @@ public class KavenegarMessageSender
     {
     }
 
+    public KavenegarMessageSender(
+        string apiKey) : base(new HttpClientHelper(new HttpClient()), apiKey)
+    {
+    }
+
     /// <summary>
     ///     Send one message for only the receptor
     /// </summary>

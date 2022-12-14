@@ -13,6 +13,11 @@ public class KavenegarProfileApi
         string apiKey) : base(httpClientHelper, apiKey)
     {
     }
+    
+    public KavenegarProfileApi(
+        string apiKey) : base(new HttpClientHelper(new HttpClient()), apiKey)
+    {
+    }
 
     public async Task<StatusMessageDto?> Status(
         string messageId,
