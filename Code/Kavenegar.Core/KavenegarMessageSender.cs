@@ -98,6 +98,31 @@ public class KavenegarMessageSender
     }
 
     public async Task<List<SendResultDto>?> Send(
+        string message,
+        IEnumerable<string> receptors,
+        string sender = "",
+        DateTime? dateTime = null,
+        bool hide = false,
+        MessageType messageType = MessageType.AppMemory,
+        CancellationToken cancellationToken = default)
+    {
+        var sendSingleMessageRequest = new SendSingleMessageRequest(
+            new MessageInfo(message)
+            {
+                Sender = sender,
+                Type = messageType
+            },
+            receptors.ToDictionary(i => i, _ => "")!)
+        {
+            Hide = hide
+        };
+
+        if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
+
+        return await Send(sendSingleMessageRequest, cancellationToken);
+    }
+
+    public async Task<List<SendResultDto>?> Send(
         SendSingleMessageRequest message,
         CancellationToken cancellationToken = default)
     {

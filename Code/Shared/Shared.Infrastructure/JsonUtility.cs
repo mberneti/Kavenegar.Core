@@ -15,6 +15,11 @@ public static class JsonUtility
         CancellationToken cancellationToken = default)
     {
         var content = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<T>(content);
+        return JsonSerializer.Deserialize<T>(
+            content,
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
     }
 }
