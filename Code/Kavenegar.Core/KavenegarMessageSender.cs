@@ -16,6 +16,11 @@ public class KavenegarMessageSender
     {
     }
 
+    public KavenegarMessageSender(
+        string apiKey) : base(new HttpClientHelper(new HttpClient()), apiKey)
+    {
+    }
+
     /// <summary>
     ///     Send one message for only the receptor
     /// </summary>
@@ -88,6 +93,31 @@ public class KavenegarMessageSender
                 Type = messageType
             },
             receptors)
+        {
+            Hide = hide
+        };
+
+        if (dateTime.HasValue) sendSingleMessageRequest.Date = dateTime;
+
+        return await Send(sendSingleMessageRequest, cancellationToken);
+    }
+
+    public async Task<List<SendResultDto>?> Send(
+        string message,
+        IEnumerable<string> receptors,
+        string sender = "",
+        DateTime? dateTime = null,
+        bool hide = false,
+        MessageType messageType = MessageType.AppMemory,
+        CancellationToken cancellationToken = default)
+    {
+        var sendSingleMessageRequest = new SendSingleMessageRequest(
+            new MessageInfo(message)
+            {
+                Sender = sender,
+                Type = messageType
+            },
+            receptors.ToDictionary(i => i, _ => "")!)
         {
             Hide = hide
         };
