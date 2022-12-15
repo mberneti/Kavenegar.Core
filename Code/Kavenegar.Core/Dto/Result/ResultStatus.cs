@@ -6,7 +6,7 @@ internal class ResultStatus
 {
     [JsonPropertyName("status")]
     public int Status { get; set; }
-    
+
     [JsonPropertyName("message")]
     public string Message { get; set; } = null!;
 }

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IntegrationTest.Controllers;
 
-[ApiController]
-[Route("[controller]/[action]")]
-public class KavenegarProfileController : ControllerBase
+public class KavenegarProfileController : BaseAPiController
 {
     private readonly IKavenegarProfileApi _kavenegarProfileApi;
 
@@ -20,7 +18,7 @@ public class KavenegarProfileController : ControllerBase
     public async Task<IActionResult> Cancel(
         IEnumerable<string> ids)
     {
-        return Ok(await _kavenegarProfileApi.Cancel(ids));
+        return HandleValue(await _kavenegarProfileApi.Cancel(ids));
     }
 
     [HttpGet]
@@ -28,21 +26,21 @@ public class KavenegarProfileController : ControllerBase
         string line,
         bool isRead)
     {
-        return Ok(await _kavenegarProfileApi.Receive(line, isRead));
+        return HandleValue(await _kavenegarProfileApi.Receive(line, isRead));
     }
 
     [HttpGet]
     public async Task<IActionResult> Select(
-        IEnumerable<string> messageIds)
+        [FromQuery] IEnumerable<string> messageIds)
     {
-        return Ok(await _kavenegarProfileApi.Select(messageIds));
+        return HandleValue(await _kavenegarProfileApi.Select(messageIds));
     }
 
     [HttpGet]
     public async Task<IActionResult> Status(
-        IEnumerable<string> messageIds)
+        [FromQuery] IEnumerable<string> messageIds)
     {
-        return Ok(await _kavenegarProfileApi.Status(messageIds));
+        return HandleValue(await _kavenegarProfileApi.Status(messageIds));
     }
 
     [HttpPost]
@@ -54,7 +52,7 @@ public class KavenegarProfileController : ControllerBase
         int? minCreditAlarm = null,
         string? resendFailed = null)
     {
-        return Ok(
+        return HandleValue(
             await _kavenegarProfileApi.AccountConfig(
                 apiLogs,
                 dailyReport,
@@ -67,7 +65,7 @@ public class KavenegarProfileController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> AccountInfo()
     {
-        return Ok(await _kavenegarProfileApi.AccountInfo());
+        return HandleValue(await _kavenegarProfileApi.AccountInfo());
     }
 
     [HttpGet]
@@ -77,7 +75,7 @@ public class KavenegarProfileController : ControllerBase
         string? lineNumber,
         bool? isRead)
     {
-        return Ok(
+        return HandleValue(
             await _kavenegarProfileApi.CountInbox(
                 startDate,
                 endDate,
@@ -91,7 +89,7 @@ public class KavenegarProfileController : ControllerBase
         DateTime? endDate = null,
         MessageStatus? status = null)
     {
-        return Ok(
+        return HandleValue(
             await _kavenegarProfileApi.CountOutbox(
                 startDate,
                 endDate,
@@ -103,7 +101,7 @@ public class KavenegarProfileController : ControllerBase
         int? pageSize = null,
         string? sender = null)
     {
-        return Ok(await _kavenegarProfileApi.LatestOutbox(pageSize, sender));
+        return HandleValue(await _kavenegarProfileApi.LatestOutbox(pageSize, sender));
     }
 
     [HttpGet]
@@ -112,7 +110,7 @@ public class KavenegarProfileController : ControllerBase
         DateTime? endDate = null,
         string? sender = null)
     {
-        return Ok(
+        return HandleValue(
             await _kavenegarProfileApi.SelectOutbox(
                 startDate,
                 endDate,
@@ -121,8 +119,8 @@ public class KavenegarProfileController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> StatusLocalMessageId(
-        IEnumerable<string> messageIds)
+        [FromQuery] IEnumerable<string> messageIds)
     {
-        return Ok(await _kavenegarProfileApi.StatusLocalMessageId(messageIds));
+        return HandleValue(await _kavenegarProfileApi.StatusLocalMessageId(messageIds));
     }
 }
