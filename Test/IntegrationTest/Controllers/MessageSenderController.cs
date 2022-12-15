@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IntegrationTest.Controllers;
 
-[ApiController]
-[Route("[controller]/[action]")]
-public class MessageSenderController : ControllerBase
+public class MessageSenderController : BaseAPiController
 {
     private readonly IKavenegarMessageSender _kavenegarMessageSender;
 
@@ -20,20 +18,20 @@ public class MessageSenderController : ControllerBase
     public async Task<IActionResult> SendSingleMessage(
         SendSingleMessageRequest singleMessageRequest)
     {
-        return Ok(await _kavenegarMessageSender.Send(singleMessageRequest));
+        return HandleValue(await _kavenegarMessageSender.Send(singleMessageRequest));
     }
 
     [HttpPost]
     public async Task<IActionResult> SendMultiMessage(
         SendMultiMessageRequest sendMultiMessageRequest)
     {
-        return Ok(await _kavenegarMessageSender.Send(sendMultiMessageRequest));
+        return HandleValue(await _kavenegarMessageSender.Send(sendMultiMessageRequest));
     }
 
     [HttpPost]
     public async Task<IActionResult> VerifyLookUp(
         VerifyLookupRequest verifyLookupRequest)
     {
-        return Ok(await _kavenegarMessageSender.VerifyLookup(verifyLookupRequest));
+        return HandleValue(await _kavenegarMessageSender.VerifyLookup(verifyLookupRequest));
     }
 }
