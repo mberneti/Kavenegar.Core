@@ -126,8 +126,8 @@ namespace Kavenegar
         private async Task<string> Execute(string path, Dictionary<string, object> _params)
         {
             var nvc = _params?.Select(x => new KeyValuePair<string, string>(x.Key, x.Value?.ToString()));
-
-            var postdata = new FormUrlEncodedContent(nvc);
+            
+            var postdata = nvc != null ?  new FormUrlEncodedContent(nvc):null;
 
             var response = await _client.PostAsync(path, postdata);
             var responseBody = await response.Content.ReadAsStringAsync();
